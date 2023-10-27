@@ -1,7 +1,10 @@
 package share.login;
 
-public class login {
+import java.io.Serializable;
 
+public class login implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     String email, pass, msg;
     boolean isValid;
 

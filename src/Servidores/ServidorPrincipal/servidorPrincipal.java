@@ -1,68 +1,50 @@
 package Servidores.ServidorPrincipal;
 
-import java.util.Scanner;
 
-public class servidorPrincipal {
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
+public class servidorPrincipal extends Thread {
 
+    private Socket toClientSocket, auxSocket;
 
+    public servidorPrincipal(Socket toClientSocket){
+        this.toClientSocket = toClientSocket;
+    }
+
+    @Override
+    public void run() {
+
+    }
 
 
     public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
-        int escolha;
+        if(args.length != 4){
+            System.out.println("Sintaxe: java servidorPrincipal listeningPort localDirectoryBD serviceNameRMI listeningPortRMI");
+            return;
+        }
 
-        do {
 
-            System.out.println("Escolha uma opção:");
-            System.out.println("1. Criar Evento");
-            System.out.println("2. Editar Evento.");
-            System.out.println("3. Eliminar Evento.");
-            System.out.println("4. Consultar Evento Criados.");
-            System.out.println("5. Gera Codigo Evento.");
-            System.out.println("6. Consulta Presenças."); // Obtenção de um ficheiro csv com a lista de presenças
-            System.out.println("7. Consulta dos eventos de um utilizador."); // Obtenção de um ficheiro csv com a lista de presenças
-            System.out.println("8. Eliminar presença registada.");
-            System.out.println("9. Inserção de presença manual.");
-            System.out.println("10. Logout");
+        try(ServerSocket socket = new ServerSocket(Integer.parseInt(args[0]))){
 
-            escolha = sc.nextInt();
+            System.out.println("TCP Server iniciado no porto " + socket.getLocalPort() + " ...");
 
-            switch (escolha) {
-                case 1:
+            while(true){
 
-                    break;
-                case 2:
+                Socket toClientSocket = socket.accept();
+                new servidorPrincipal(toClientSocket).start();
 
-                    break;
-                case 3:
-
-                    break;
-                case 4:
-
-                    break;
-                case 5:
-
-                    break;
-                case 6:
-
-                    break;
-                case 7:
-
-                    break;
-                case 8:
-
-                    break;
-                case 9:
-                    break;
-                case 10:
-                    System.out.println("Saindo do programa.");
-                    break;
-                default:
-                    System.out.println("Opção inválida. Escolha novamente.");
             }
 
-        }while (escolha != 10);
+        }catch(NumberFormatException e){
+            System.out.println("O porto de escuta deve ser um inteiro positivo.");
+        }catch(IOException e){
+            System.out.println("Ocorreu um erro ao nivel do socket de escuta:\n\t"+e);
+        }
+
+
     }
 }

@@ -1,23 +1,12 @@
 package Servidores.ServidorPrincipal;
 
+import Servidores.ServidorPrincipal.ConectionClientThread.conectionClientThread;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class servidorPrincipal extends Thread {
-
-    private Socket toClientSocket, auxSocket;
-
-    public servidorPrincipal(Socket toClientSocket){
-        this.toClientSocket = toClientSocket;
-    }
-
-    @Override
-    public void run() {
-
-    }
 
 
     public static void main(String[] args) {
@@ -35,7 +24,7 @@ public class servidorPrincipal extends Thread {
             while(true){
 
                 Socket toClientSocket = socket.accept();
-                new servidorPrincipal(toClientSocket).start();
+                new conectionClientThread(toClientSocket).start();
 
             }
 

@@ -5,8 +5,8 @@ import java.io.Serializable;
 public class login implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    String email, pass, msg;
-    boolean isValid;
+    private String email, pass, msg;
+    private boolean isValid;
 
     public login(String email, String pass) {
         this.email = email;

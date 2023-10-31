@@ -1,65 +1,79 @@
 package Clientes.main;
 
 import java.util.Scanner;
+import Clientes.communication.ClientCommunication;
+import share.login.login;
+import share.registo.registo;
 
 public class ClienteApp {
 
     public static void main(String[] args) {
-
         Scanner sc = new Scanner(System.in);
-        int escolha;
+        ClientCommunication communication;
 
-        do {
+        try {
+            communication = new ClientCommunication("serverAddress", 1234); // Substitua com o endereço e porta corretos
 
-            System.out.println("Escolha uma opção:");
-            System.out.println("1. Criar Evento");
-            System.out.println("2. Editar Evento.");
-            System.out.println("3. Eliminar Evento.");
-            System.out.println("4. Consultar Evento Criados.");
-            System.out.println("5. Gera Codigo Evento.");
-            System.out.println("6. Consulta Presenças."); // Obtenção de um ficheiro csv com a lista de presenças
-            System.out.println("7. Consulta dos eventos de um utilizador."); // Obtenção de um ficheiro csv com a lista de presenças
-            System.out.println("8. Eliminar presença registada.");
-            System.out.println("9. Inserção de presença manual.");
-            System.out.println("10. Logout");
+            int escolha;
+            do {
+                System.out.println("Escolha uma opção:");
+                System.out.println("1. Registrar");
+                System.out.println("2. Fazer Login");
+                System.out.println("3. Sair");
 
-            escolha = sc.nextInt();
+                escolha = sc.nextInt();
+                sc.nextLine(); // Limpar o buffer
 
-            switch (escolha) {
-                case 1:
+                switch (escolha) {
+                    case 1:
+                        System.out.println("Introduza o seu nome");
+                        String nome = sc.nextLine();
+                        System.out.println("Introduza o seu numero de identificação");
+                        String numID = sc.nextLine();
+                        System.out.println("Introduza o seu email:");
+                        String email = sc.nextLine();
+                        System.out.println("Introduza a sua password:");
+                        String password = sc.nextLine();
 
-                    break;
-                case 2:
+                        registo userRegister = new registo(nome, numID, email, password);
+                        registo responseRegister = communication.registerUser(userRegister);
 
-                    break;
-                case 3:
+                        if(responseRegister.isRegistered()) {
+                            System.out.println(responseRegister.getMsg());
+                        } else {
+                            System.out.println("Erro no registo");
+                        }
+                        break;
 
-                    break;
-                case 4:
+                    case 2:
+                        System.out.println("Introduza o seu email:");
+                        email = sc.nextLine();
+                        System.out.println("Introduza a sua password:");
+                        password = sc.nextLine();
 
-                    break;
-                case 5:
+                        login userLogin = new login(email, password);
+                        login responseLogin = communication.authenticateUser(userLogin);
 
-                    break;
-                case 6:
+                        if(responseLogin.isValid()) {
+                            System.out.println("Autenticação bem-sucedida!");
+                        } else {
+                            System.out.println("Erro de autenticação: " + responseLogin.getMsg());
+                        }
+                        break;
 
-                    break;
-                case 7:
+                    case 3:
+                        System.out.println("A sair do programa...");
+                        break;
+                    default:
+                        System.out.println("Opção inválida. Escolha novamente.");
+                }
 
-                    break;
-                case 8:
+            } while (escolha != 3);
 
-                    break;
-                case 9:
-                    break;
-                case 10:
-                    System.out.println("Saindo do programa.");
-                    break;
-                default:
-                    System.out.println("Opção inválida. Escolha novamente.");
-            }
-
-        }while (escolha != 10);
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        } finally {
+            sc.close();
+        }
     }
-
 }

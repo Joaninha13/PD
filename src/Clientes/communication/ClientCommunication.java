@@ -31,6 +31,20 @@ public class ClientCommunication {
         }
     }
 
+    public registo editUserData(registo userData) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            userData.setMsg("edit");
+
+            oout.writeObject(userData);
+            oout.flush();
+
+            return (registo) oin.readObject();
+        }
+    }
+
     public registo registerUser(registo userRegister) throws IOException, ClassNotFoundException {
         try (Socket socket = new Socket(serverAddr, serverPort);
              ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
@@ -42,6 +56,4 @@ public class ClientCommunication {
             return (registo) oin.readObject();
         }
     }
-
-    // Falta adicionar o resto das funcionalidades
 }

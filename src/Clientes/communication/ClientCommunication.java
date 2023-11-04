@@ -56,4 +56,19 @@ public class ClientCommunication {
             return (registo) oin.readObject();
         }
     }
+
+    public String submitCode(String code, String email) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "sub " + code + " " + email;
+            oout.writeObject(message);
+            oout.flush();
+
+            // Esperar pela resposta do servidor
+            String response = (String) oin.readObject();
+            return response;
+        }
+    }
 }

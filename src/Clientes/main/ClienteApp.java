@@ -128,6 +128,16 @@ public class ClienteApp {
                             }
                             break;
 
+                        case 2:
+                            System.out.println("Por favor, insira o código que deseja submeter:");
+                            String codigo = sc.nextLine();
+                            try {
+                                String responseSubmit = communication.submitCode(codigo, currentUser.getEmail());
+                                System.out.println("Resposta do servidor: " + responseSubmit);
+                            } catch (IOException | ClassNotFoundException e) {
+                                System.out.println("Erro ao submeter código: " + e.getMessage());
+                            }
+                            break;
 
                         case 9:
                             isLoggedIn = false;

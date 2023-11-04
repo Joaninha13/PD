@@ -66,9 +66,26 @@ public class ClientCommunication {
             oout.writeObject(message);
             oout.flush();
 
-            // Esperar pela resposta do servidor
             String response = (String) oin.readObject();
             return response;
         }
     }
+
+    public String consultAttendance(String email, String filter) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "ConsultPresenca " + email;
+            if (filter != null && !filter.isEmpty()) {
+                message += " " + filter;
+            }
+
+            oout.writeObject(message);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
 }

@@ -9,14 +9,15 @@ import share.registo.registo;
 public class ClienteApp {
 
     private static boolean isLoggedIn = false;
-    private static registo currentUser; // Dados do utilizador atualmente autenticado
+    private static boolean isAdmin = false;
+    private static registo currentUser;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         ClientCommunication communication;
 
         try {
-            communication = new ClientCommunication("localhost", 1234); // Substitua com o endereço e porta corretos
+            communication = new ClientCommunication("localhost", 1234); //foi para testar
 
             int escolha;
             do {
@@ -26,7 +27,7 @@ public class ClienteApp {
                 System.out.println("3. Sair");
 
                 escolha = sc.nextInt();
-                sc.nextLine(); // Limpar o buffer
+                sc.nextLine();
 
                 switch (escolha) {
                     case 1:
@@ -78,10 +79,13 @@ public class ClienteApp {
 
                 while (isLoggedIn) {
                     System.out.println("1. Editar dados de Registo");
+                    System.out.println("2. Submeter código de registo da presença");
+                    System.out.println("3. Consultar presenças registadas");
+                    System.out.println("4. Obter ficheiro csv");
                     System.out.println("9. Logout");
 
                     int opcao = sc.nextInt();
-                    sc.nextLine(); // Limpar o buffer
+                    sc.nextLine();
 
                     switch (opcao) {
                         case 1:
@@ -139,8 +143,21 @@ public class ClienteApp {
                             }
                             break;
 
+                        case 3:
+                            System.out.println("Consulta de presenças. Se quiser aplicar um filtro, introduza-o agora, caso contrário, deixe em branco:");
+                            String filter = sc.nextLine();
+
+                            try {
+                                String attendanceResponse = communication.consultAttendance(currentUser.getEmail(), filter);
+                                System.out.println("Resposta do servidor: " + attendanceResponse);
+                            } catch (IOException | ClassNotFoundException e) {
+                                System.out.println("Erro ao consultar presenças: " + e.getMessage());
+                            }
+                            break;
+
                         case 9:
                             isLoggedIn = false;
+                            currentUser = null;
                             System.out.println("Logout...");
                             break;
 

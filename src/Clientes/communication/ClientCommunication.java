@@ -88,4 +88,16 @@ public class ClientCommunication {
         }
     }
 
+    public String sendEventDetails(String eventDetails) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            oout.writeObject(eventDetails);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
 }

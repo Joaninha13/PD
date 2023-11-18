@@ -11,7 +11,7 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class servidorPrincipal extends Thread {
+public class servidorPrincipal{
 
 
     public static void main(String[] args) {
@@ -31,7 +31,7 @@ public class servidorPrincipal extends Thread {
             while(true){
 
                 Socket toClientSocket = socket.accept();
-                new conectionClientThread(toClientSocket).start();
+                new conectionClientThread(toClientSocket, bd).start();
 
             }
 

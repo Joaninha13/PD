@@ -253,6 +253,8 @@ public class conectionBD {
     //Utilizadores
 
     public boolean autenticaCliente(String email, String password){
+        System.out.println("entrei no autenticaCliente");
+
         try {
             String selectQuery = "SELECT * FROM Utilizadores WHERE Email = '" + email + "' AND Password = '" + password + "'";
             Statement stmt = conn.createStatement();

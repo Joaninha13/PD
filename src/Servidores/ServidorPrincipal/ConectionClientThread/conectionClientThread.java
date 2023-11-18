@@ -16,8 +16,10 @@ public class conectionClientThread extends Thread{
     private Socket toClientSocket, auxSocket;
     private conectionBD bd;
 
-    public conectionClientThread(Socket toClientSocket){
+    public conectionClientThread(Socket toClientSocket, conectionBD bd){
+        this.bd = bd;
         this.toClientSocket = toClientSocket;
+        auxSocket = toClientSocket;
     }
 
     @Override
@@ -31,31 +33,36 @@ public class conectionClientThread extends Thread{
         try (ObjectOutputStream oout = new ObjectOutputStream(toClientSocket.getOutputStream());
              ObjectInputStream oin = new ObjectInputStream(toClientSocket.getInputStream())){
 
+            Object obj = oin.readObject();
+
             // talvez mudar estes dois primeiros ifs para so mandar uma mensagem a dizer que o foi bem sucedido o não!!
-            if (oin.readObject() instanceof login) {
+            if (obj instanceof login) {
 
                 System.out.println("Recebi class login");
-                log = (login) oin.readObject();
+                log = (login) obj;
+
+                System.out.println("Depois do read -> " + log.getEmail() + " " + log.getPass());
 
                 if (!bd.autenticaCliente(log.getEmail(), log.getPass())) {
                     log.setValid(false);
                     log.setMsg("Email ou password errados");
                 }
                 else {
+                    System.out.println("entrei no else");
                     log.setValid(true);
                     log.setMsg("Bem vindo");
                 }
 
+
                 oout.writeObject(log);
                 oout.flush();
 
-                System.out.println("Mandei class login");
 
             }
-            else if (oin.readObject() instanceof registo) {
+            else if (obj instanceof registo) {
 
                 System.out.println("Recebi registo");
-                reg = (registo) oin.readObject();
+                reg = (registo) obj;
 
 
                 if (reg.getMsg().equalsIgnoreCase("edit")){
@@ -79,19 +86,19 @@ public class conectionClientThread extends Thread{
                 System.out.println("Mandei class registo");
 
             }
-            else if (oin.readObject() instanceof events) {
+            else if (obj instanceof events) {
 
                 System.out.println("Recebi a classe events");
-                event = (events) oin.readObject();
+                event = (events) obj;
 
                 oout.writeObject(bd.editEvento(event));
                 oout.flush();
 
             }
-            else if (oin.readObject() instanceof ConsultPresence) {/*fazer coisas depois tenho de ver*/}
-            else if (oin.readObject() instanceof String) {
+            else if (obj instanceof ConsultPresence) {/*fazer coisas depois tenho de ver*/}
+            else if (obj instanceof String) {
                 System.out.println("Recebi string");
-                msg = (String) oin.readObject();
+                msg = (String) obj;
 
                 //divisao da msg por espaços
 
@@ -149,8 +156,6 @@ public class conectionClientThread extends Thread{
 
             }
 
-
-            auxSocket = toClientSocket;
         } catch (ClassNotFoundException e) {
             System.out.println();
             System.out.println("Mensagem recebida de tipo inesperado!");

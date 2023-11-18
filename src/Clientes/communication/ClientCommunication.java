@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import share.login.login;
@@ -13,10 +14,12 @@ public class ClientCommunication {
 
     private InetAddress serverAddr;
     private int serverPort;
+    private Socket socket;
 
     public ClientCommunication(String serverAddress, int serverPort) throws UnknownHostException {
         this.serverAddr = InetAddress.getByName(serverAddress);
         this.serverPort = serverPort;
+        this.socket = new Socket();
     }
 
     public login authenticateUser(login userLogin) throws IOException, ClassNotFoundException {
@@ -100,4 +103,14 @@ public class ClientCommunication {
         }
     }
 
+    public boolean isConnected() {
+        try {
+            if (!socket.isConnected()) {
+                socket.connect(new InetSocketAddress(serverAddr, serverPort));
+            }
+            return socket.isConnected();
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

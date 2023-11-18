@@ -1,6 +1,7 @@
 package Clientes.main;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.Scanner;
 import Clientes.communication.ClientCommunication;
 import share.login.login;
@@ -16,11 +17,18 @@ public class ClienteApp {
         Scanner sc = new Scanner(System.in);
         ClientCommunication communication;
 
+
         String serverAddress = args[0];
         int serverPort = Integer.parseInt(args[1]);
 
         try {
             communication = new ClientCommunication(serverAddress, serverPort);
+            if(communication.isConnected()){
+                System.out.println("Conexão bem sucedida");
+            }
+            else{
+                System.out.println("Conexão falhada");
+            }
 
             int escolha;
             do {

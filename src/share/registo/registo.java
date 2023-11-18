@@ -32,9 +32,7 @@ public class registo implements Serializable {
         return identificationNumber;
     }
 
-    public void setIdentificationNumber(String identificationNumber) {
-        this.identificationNumber = identificationNumber;
-    }
+    public void setIdentificationNumber(String identificationNumber) {this.identificationNumber = identificationNumber;}
 
     public String getEmail() {
         return email;

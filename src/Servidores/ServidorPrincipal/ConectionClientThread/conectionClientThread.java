@@ -1,6 +1,8 @@
 package Servidores.ServidorPrincipal.ConectionClientThread;
 
 import Servidores.ServidorPrincipal.BDConection.conectionBD;
+import share.consultas.ConsultPresence;
+import share.events.events;
 import share.login.login;
 import share.registo.registo;
 
@@ -23,86 +25,126 @@ public class conectionClientThread extends Thread{
 
         login log = null;
         registo reg = null;
-        String msg;
+        events event = null;
+        String msg, resp;
 
         try (ObjectOutputStream oout = new ObjectOutputStream(toClientSocket.getOutputStream());
              ObjectInputStream oin = new ObjectInputStream(toClientSocket.getInputStream())){
 
-
-            //assim da?
-
+            // talvez mudar estes dois primeiros ifs para so mandar uma mensagem a dizer que o foi bem sucedido o não!!
             if (oin.readObject() instanceof login) {
+
                 System.out.println("Recebi class login");
                 log = (login) oin.readObject();
+
+                if (!bd.autenticaCliente(log.getEmail(), log.getPass())) {
+                    log.setValid(false);
+                    log.setMsg("Email ou password errados");
+                }
+                else {
+                    log.setValid(true);
+                    log.setMsg("Bem vindo");
+                }
+
+                oout.writeObject(log);
+                oout.flush();
+
             }
             else if (oin.readObject() instanceof registo) {
+
                 System.out.println("Recebi registo");
                 reg = (registo) oin.readObject();
+
+
+                if (reg.getMsg().equalsIgnoreCase("edit")){
+                    //editar dados do utilizador
+                    oout.writeObject(bd.editCliente(reg));
+                    oout.flush();
+                }
+                else if (!bd.registaCliente(reg)) {
+                    reg.setRegistered(false);
+                    reg.setMsg("Email ja se encontra registrado");
+
+                }
+                else {
+                    reg.setRegistered(true);
+                    reg.setMsg("Registo efetuado com sucesso");
+                }
+
+                oout.writeObject(reg);
+                oout.flush();
+
             }
+            else if (oin.readObject() instanceof events) {
+
+                System.out.println("Recebi a classe events");
+                event = (events) oin.readObject();
+
+                oout.writeObject(bd.editEvento(event));
+                oout.flush();
+
+            }
+            else if (oin.readObject() instanceof ConsultPresence) {/*fazer coisas depois tenho de ver*/}
             else if (oin.readObject() instanceof String) {
                 System.out.println("Recebi string");
                 msg = (String) oin.readObject();
+
+                //divisao da msg por espaços
+
+                String[] parts = msg.split(" ");
+
+                //verificar se o primeiro elemento é um comando
+
+                if (parts[0].equals("sub")){
+                    //adicionar o utilizador a lista de presenças do evento
+
+                    oout.writeObject(bd.registaPresenca(parts[1], parts[2]));
+                    oout.flush();
+
+                }
+                else if (parts[0].equals("create")) {
+                    //criar evento
+
+                    oout.writeObject(bd.criaEvento(parts[1], parts[2], parts[3], parts[4], parts[5]));
+                    oout.flush();
+
+                }
+                else if (parts[0].equals("delete")) {
+                    //eliminar evento
+
+                    oout.writeObject(bd.eliminaEvento(parts[1]));
+                    oout.flush();
+
+                }
+                else if (parts[0].equals("checkin")) {
+                    //adicionar o utilizador a lista de presenças do evento
+
+                    oout.writeObject(bd.inserePresenca(parts[1], parts[2]));
+                    oout.flush();
+
+                }
+                else if (parts[0].equals("checkout")) {
+                    //remover o utilizador da lista de presenças do evento
+
+                    oout.writeObject(bd.eliminaPresenca(parts[1], parts[2]));
+                    oout.flush();
+
+                }
+                else if (parts[0].equals("gerar")) {
+                    //gerar codigo
+
+                    oout.writeObject(bd.geraCodigo(parts[1], parts[2]));
+                    oout.flush();
+                }
+                else if (parts[0].equals("ConsultPresenca")) {
+                    //gerar codigo
+
+                    oout.writeObject(bd.geraCodigo(parts[1], parts[2]));
+                    oout.flush();
+                }
+
             }
 
-
-            //ou assim?
-            /*try{
-
-                log = (login) oin.readObject();
-
-            }catch(IOException e){
-                System.out.println("Nao é login, é registo");
-                reg = (registo) oin.readObject();
-            }*/
-
-            //ou assim?
-
-            /*if ((log = (login) oin.readObject()) == null)//EOF
-                return;
-            else if((reg = (registo) oin.readObject()) == null)//EOF
-                return;*/
-
-            // para teste
-
-            //System.out.println("[" + /*Thread.currentThread().*/getName() + "]Recebido \"" + log.getEmail() + "\" de " +
-            //       toClientSocket.getInetAddress().getHostAddress() + ":" +
-            //       toClientSocket.getPort());
-            
-            /*if (reg != null){
-                registo auxReg = new registo(reg.getName(), reg.getIdentificationNumber(), reg.getEmail(), reg.getPassword());
-
-                if (!bd.registaCliente()) {
-                    auxReg.setRegistered(false);
-                    auxReg.setMsg("Email ja se encontra registrado");
-
-                }
-                else {
-                    auxReg.setRegistered(true);
-                    auxReg.setMsg("Registo efetuado com sucesso");
-                }
-
-                oout.writeObject(auxReg);
-                oout.flush();
-                
-            }
-            else{
-
-                login auxLog = new login(log.getEmail(), log.getPass());
-
-                //Verificar se o mail e pass estao na BD
-                if (!bd.autenticaCliente()) {
-                    auxLog.setValid(false);
-                    auxLog.setMsg("Email ou password errados");
-                }
-                else {
-                    auxLog.setValid(true);
-                    auxLog.setMsg("Bem vindo");
-                }
-
-                oout.writeObject(auxLog);
-                oout.flush();
-
-            }*/
 
             auxSocket = toClientSocket;
         } catch (ClassNotFoundException e) {

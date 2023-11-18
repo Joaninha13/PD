@@ -16,8 +16,11 @@ public class ClienteApp {
         Scanner sc = new Scanner(System.in);
         ClientCommunication communication;
 
+        String serverAddress = args[0];
+        int serverPort = Integer.parseInt(args[1]);
+
         try {
-            communication = new ClientCommunication("localhost", 1234); //foi para testar
+            communication = new ClientCommunication(serverAddress, serverPort);
 
             int escolha;
             do {

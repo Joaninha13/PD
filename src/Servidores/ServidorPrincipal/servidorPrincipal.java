@@ -25,7 +25,7 @@ public class servidorPrincipal extends Thread {
         conectionBD.criarBD();
 
 
-        /*try(ServerSocket socket = new ServerSocket(Integer.parseInt(args[0]))){
+        try(ServerSocket socket = new ServerSocket(Integer.parseInt(args[0]))){
 
             System.out.println("TCP Server iniciado no porto " + socket.getLocalPort() + " ...");
 
@@ -34,12 +34,12 @@ public class servidorPrincipal extends Thread {
                 Socket toClientSocket = socket.accept();
                 new conectionClientThread(toClientSocket).start();
 
-            }*/
+            }
 
-        /*}catch(NumberFormatException e){
+        }catch(NumberFormatException e){
             System.out.println("O porto de escuta deve ser um inteiro positivo.");
         }catch(IOException e){
             System.out.println("Ocorreu um erro ao nivel do socket de escuta:\n\t"+e);
-        }*/
+        }
     }
 }

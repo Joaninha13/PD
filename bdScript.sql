@@ -1,14 +1,12 @@
 -- Path: bdScript.sql
 
-SET time_zone = "+00:00";
-
 CREATE TABLE IF NOT EXISTS Versao (numero_versao INTEGER NOT NULL);
 
 CREATE TABLE IF NOT EXISTS Eventos (Designacao Varchar(100) PRIMARY KEY, Localidade Varchar(100), Data Date, Hora_Inicio Time, Hora_Fim Time);
 
 CREATE TABLE IF NOT EXISTS Codigo_Registo (codigo Varchar(100),Tempo INTEGER,Evento_Designacao Varchar(100),FOREIGN KEY (Evento_Designacao) REFERENCES Evento (Designacao));
 
-CREATE TABLE IF NOT EXISTS Utilizadores (Numero_Indentificacao INTEGER PRIMARY KEY, Nome Varchar(100), Email Varchar(100), Password Varchar(100), HearBeat TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,);
+CREATE TABLE IF NOT EXISTS Utilizadores (Numero_Indentificacao INTEGER PRIMARY KEY, Nome Varchar(100), Email Varchar(100), Password Varchar(100));
 
 -- Inserir um utilizador na tabela Utilizadores
 INSERT INTO Utilizadores (Numero_Indentificacao, Nome, Email, Password) VALUES ('1', 'admin', 'admin@isec.com', 'admin');

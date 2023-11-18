@@ -49,6 +49,8 @@ public class conectionClientThread extends Thread{
                 oout.writeObject(log);
                 oout.flush();
 
+                System.out.println("Mandei class login");
+
             }
             else if (oin.readObject() instanceof registo) {
 
@@ -73,6 +75,8 @@ public class conectionClientThread extends Thread{
 
                 oout.writeObject(reg);
                 oout.flush();
+
+                System.out.println("Mandei class registo");
 
             }
             else if (oin.readObject() instanceof events) {

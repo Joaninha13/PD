@@ -22,8 +22,7 @@ public class servidorPrincipal extends Thread {
             return;
         }*/
 
-        conectionBD.criarBD();
-
+        conectionBD bd = new conectionBD();
 
         try(ServerSocket socket = new ServerSocket(Integer.parseInt(args[0]))){
 

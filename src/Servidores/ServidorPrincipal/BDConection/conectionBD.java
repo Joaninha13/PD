@@ -24,6 +24,9 @@ public class conectionBD {
     // Start/create functions
     public conectionBD(){
         //connect a BD
+
+        criarBD();
+
         try {
             conn = java.sql.DriverManager.getConnection(URL_CONEXAO);
             System.out.println("Connection to SQLite has been established.");

@@ -155,6 +155,7 @@ public class ClienteApp {
                                 String newName = sc.nextLine();
                                 if (!newName.isEmpty()) {
                                     currentUser.setName(newName);
+
                                 }
 
                                 System.out.println("Número de identificação atual: " + currentUser.getIdentificationNumber());

@@ -49,6 +49,9 @@ public class conectionClientThread extends Thread{
                 }
                 else {
                     System.out.println("entrei no else");
+                    if(log.getEmail().equals("admin@isec.com")){
+                        log.setAdmin(true);
+                    }
                     log.setValid(true);
                     log.setMsg("Bem vindo");
                 }
@@ -65,7 +68,7 @@ public class conectionClientThread extends Thread{
                 reg = (registo) obj;
 
 
-                if (reg.getMsg().equalsIgnoreCase("edit")){
+                if (reg.getMsg()!=null && reg.getMsg().equalsIgnoreCase("edit")){
                     //editar dados do utilizador
                     oout.writeObject(bd.editCliente(reg));
                     oout.flush();

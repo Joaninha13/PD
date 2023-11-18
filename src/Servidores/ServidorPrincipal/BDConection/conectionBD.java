@@ -12,7 +12,7 @@ public class conectionBD {
 
     private static final String NOME_BD = "dataBaseTP.db";
 
-    private static int IDUtilizador = 1;
+    private static int IDUtilizador = 2;
 
 
     // URL de conexão com o banco de dados

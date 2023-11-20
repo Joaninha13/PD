@@ -6,6 +6,7 @@ import java.util.Scanner;
 import Clientes.communication.ClientCommunication;
 import share.login.login;
 import share.registo.registo;
+import share.events.events;
 
 public class ClienteApp {
 
@@ -123,7 +124,7 @@ public class ClienteApp {
                                 String nomeEvento = sc.nextLine();
                                 System.out.print("Local: ");
                                 String localEvento = sc.nextLine();
-                                System.out.print("Data (DD/MM/AAAA): ");
+                                System.out.print("Data (AAAA/MM/DD): ");
                                 String dataEvento = sc.nextLine();
                                 System.out.print("Hora de início (HH:MM): ");
                                 String horaInicio = sc.nextLine();
@@ -141,10 +142,37 @@ public class ClienteApp {
                                 }
                                 break;
                             case 2:
-                                // Lógica para editar eventos
+                                System.out.print("Novo nome do evento (deixe em branco para não alterar): ");
+                                String novoNomeEvento = sc.nextLine();
+                                System.out.print("Novo local (deixe em branco para não alterar): ");
+                                String novoLocalEvento = sc.nextLine();
+                                System.out.print("Nova data (AAAA/MM/DD, deixe em branco para não alterar): ");
+                                String novaDataEvento = sc.nextLine();
+                                System.out.print("Nova hora de início (HH:MM, deixe em branco para não alterar): ");
+                                String novaHoraInicio = sc.nextLine();
+                                System.out.print("Nova hora de fim (HH:MM, deixe em branco para não alterar): ");
+                                String novaHoraFim = sc.nextLine();
+
+                                events updatedEvent = new events(novoNomeEvento, novoLocalEvento, novaDataEvento, novaHoraInicio, novaHoraFim);
+                                updatedEvent.setMsg("edit"); // confirmar se é necessário
+
+                                try {
+                                    String response = communication.updateEvent(updatedEvent);
+                                    System.out.println("Resposta do servidor: " + response);
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao editar dados do evento: " + e.getMessage());
+                                }
                                 break;
-                            case 3:
-                                // Lógica para eliminar eventos
+                            case 3: // O evento não pode ter nenhuma presença registada
+                                System.out.print("Descrição do evento a eliminar: ");
+                                String descricaoEvento = sc.nextLine();
+
+                                try {
+                                    String response = communication.deleteEvent(descricaoEvento);
+                                    System.out.println("Resposta do servidor: " + response);
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao eliminar evento: " + e.getMessage());
+                                }
                                 break;
                             case 11:
                                 isLoggedIn = false;

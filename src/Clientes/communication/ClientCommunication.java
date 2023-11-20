@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import share.events.events;
 import share.login.login;
 import share.registo.registo;
 
@@ -97,6 +99,31 @@ public class ClientCommunication {
              ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
 
             oout.writeObject(eventDetails);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
+    public String updateEvent(events event) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            oout.writeObject(event);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
+    public String deleteEvent(String descricaoEvento) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "delete " + descricaoEvento;
+            oout.writeObject(message);
             oout.flush();
 
             return (String) oin.readObject();

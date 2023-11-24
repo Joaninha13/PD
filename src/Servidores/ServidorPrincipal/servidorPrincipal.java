@@ -53,7 +53,7 @@ public class servidorPrincipal{
 
             new RmiService(args[2], Integer.parseInt(args[3]), DBDirectory).start();
 
-            //new HeartBeat(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT).start();
+            new HeartBeat(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT).start();
 
             System.out.println("TCP Server iniciado no porto " + socket.getLocalPort() + " ...");
 

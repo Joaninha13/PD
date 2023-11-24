@@ -9,6 +9,7 @@ import share.registo.registo;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 public class conectionClientThread extends Thread{
 
@@ -38,33 +39,25 @@ public class conectionClientThread extends Thread{
             // talvez mudar estes dois primeiros ifs para so mandar uma mensagem a dizer que o foi bem sucedido o não!!
             if (obj instanceof login) {
 
-                System.out.println("Recebi class login");
                 log = (login) obj;
-
-                System.out.println("Depois do read -> " + log.getEmail() + " " + log.getPass());
 
                 if (!bd.autenticaCliente(log.getEmail(), log.getPass())) {
                     log.setValid(false);
                     log.setMsg("Email ou password errados");
                 }
                 else {
-                    System.out.println("entrei no else");
-                    if(log.getEmail().equals("admin@isec.com")){
+                    if(log.getEmail().equals("admin@isec.pt")){
                         log.setAdmin(true);
                     }
                     log.setValid(true);
                     log.setMsg("Bem vindo");
                 }
 
-
                 oout.writeObject(log);
                 oout.flush();
-
-
             }
             else if (obj instanceof registo) {
 
-                System.out.println("Recebi registo");
                 reg = (registo) obj;
 
 
@@ -91,7 +84,6 @@ public class conectionClientThread extends Thread{
             }
             else if (obj instanceof events) {
 
-                System.out.println("Recebi a classe events");
                 event = (events) obj;
 
                 oout.writeObject(bd.editEvento(event));
@@ -100,7 +92,6 @@ public class conectionClientThread extends Thread{
             }
             else if (obj instanceof ConsultPresence) {/*fazer coisas depois tenho de ver*/}
             else if (obj instanceof String) {
-                System.out.println("Recebi string");
                 msg = (String) obj;
 
                 //divisao da msg por espaços

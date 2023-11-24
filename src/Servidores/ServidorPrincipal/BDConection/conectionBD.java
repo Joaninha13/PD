@@ -4,6 +4,7 @@ import share.events.events;
 import share.registo.registo;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
@@ -11,19 +12,33 @@ import java.sql.*;
 public class conectionBD {
 
     private static final String NOME_BD = "dataBaseTP.db";
+    private int IDUtilizador;
+    private static String dbDir;
 
-    private static int IDUtilizador = 2;
-
+    private static volatile conectionBD instance = null;
 
     // URL de conexão com o banco de dados
-    private static final String URL_CONEXAO = "jdbc:sqlite:" + NOME_BD;
+    private static String URL_CONEXAO;
 
-    Connection conn;
+    private static Connection conn;
+
+    public static conectionBD getInstance() {
+        if (instance == null) {
+            synchronized(conectionBD.class) {
+                if (instance == null) {
+                    instance = new conectionBD(dbDir);
+                }
+            }
+        }
+        return instance;
+    }
 
 
     // Start/create functions
-    public conectionBD(){
+    public conectionBD(String dbDir) {
         //connect a BD
+
+        URL_CONEXAO = "jdbc:sqlite:" + dbDir + "/" + NOME_BD;
 
         criarBD();
 
@@ -31,14 +46,14 @@ public class conectionBD {
             conn = java.sql.DriverManager.getConnection(URL_CONEXAO);
             System.out.println("Connection to SQLite has been established.");
             setIDUtilizador(getLastIDUtilizador() + 1);
+            instance = this;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     } // testar -> OK
-
     public static void criarBD() {
         try {
-            Connection conexao = DriverManager.getConnection("jdbc:sqlite:" + NOME_BD);
+            Connection conexao = DriverManager.getConnection(URL_CONEXAO);
             Statement statement = conexao.createStatement();
 
             // Lê o script SQL do arquivo "bdScript.sql" e executa-o
@@ -64,23 +79,6 @@ public class conectionBD {
         }
     } // testar -> OK
 
-    //Exemplo de uma query
-    /*public String getResults() {
-        String selectQuery = "SELECT * FROM Utilizadores";
-        try {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(selectQuery);
-            String results = "";
-            while (rs.next()) {
-                results += "USER '" + rs.getInt("Numero_Indentificacao") + "' --> name: " + rs.getString("Nome") + ", Email: " + rs.getString("Email") + "\n";
-            }
-            return results;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return "";
-        }
-    }*/
-
 
     //private functions
     private int getID(String email){
@@ -91,6 +89,9 @@ public class conectionBD {
 
             // Verificar se há algum resultado
             int id = rs.getInt("Numero_Indentificacao");
+
+            System.out.println("ID: " + id);
+
 
             // Fechar recursos
             rs.close();
@@ -218,17 +219,35 @@ public class conectionBD {
 
     }
 
+    private events getEvento(String designacaoEvent) {
+
+        try(Statement stmt = conn.createStatement()) {
+            String selectQuery = "SELECT * FROM Eventos WHERE Designacao = '" + designacaoEvent + "'";
+            ResultSet rs = stmt.executeQuery(selectQuery);
+
+            // Verificar se há algum resultado
+            events event = new events(rs.getString("Designacao"), rs.getString("Localidade"), rs.getString("Data"), rs.getString("Hora_Inicio"), rs.getString("Hora_Fim"));
+
+            // Fechar recursos
+            rs.close();
+
+            return event;
+        } catch (SQLException e) {
+            System.err.println("Erro ao verificar se evento existe: " + e.getMessage());
+            return null;
+        }
+    }
+
 
     //Variavel statica
     private int getIDUtilizador() {return IDUtilizador;}
     private void incrementIDUtilizador() {IDUtilizador++;}
-    private void setIDUtilizador(int ID) {ID = ID;}
+    private void setIDUtilizador(int ID) {IDUtilizador = ID;}
     private int getLastIDUtilizador(){
 
-        try{
+        try(Statement stmt = conn.createStatement()){
 
-            String selectQuery = "SELECT * FROM Utilizadores ORDER BY Numero_Indentificacao DESC LIMIT 1";
-            Statement stmt = conn.createStatement();
+            String selectQuery = "SELECT Numero_Indentificacao FROM Utilizadores ORDER BY Numero_Indentificacao DESC LIMIT 1";
             ResultSet rs = stmt.executeQuery(selectQuery);
 
             // Verificar se há algum resultado
@@ -236,7 +255,6 @@ public class conectionBD {
 
             // Fechar recursos
             rs.close();
-            stmt.close();
 
             return id;
 
@@ -255,9 +273,8 @@ public class conectionBD {
     public boolean autenticaCliente(String email, String password){
         System.out.println("entrei no autenticaCliente");
 
-        try {
+        try(Statement stmt = conn.createStatement()) {
             String selectQuery = "SELECT * FROM Utilizadores WHERE Email = '" + email + "' AND Password = '" + password + "'";
-            Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(selectQuery);
 
             // Verificar se há algum resultado
@@ -265,28 +282,22 @@ public class conectionBD {
 
             // Fechar recursos
             rs.close();
-            stmt.close();
 
             return autenticado;
         } catch (SQLException e) {
             System.err.println("Erro ao autenticar utilizador: " + e.getMessage());
             return false;
         }
-    } // testar - >
+    } // testar - > FEITO
 
     public boolean registaCliente(registo reg){
 
         if (autenticaCliente(reg.getEmail(), reg.getPassword()))
             return false;
 
-        try {
+        try(Statement stmt = conn.createStatement()) {
             String insertQuery = "INSERT INTO Utilizadores (Numero_Indentificacao,Nome, Email, Password) VALUES ('" + getIDUtilizador() + "','" + reg.getName() + "', '" + reg.getEmail() + "', '" + reg.getPassword() + "')";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(insertQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            stmt.executeUpdate(insertQuery);
 
             incrementIDUtilizador();
 
@@ -304,14 +315,9 @@ public class conectionBD {
 
         // editar dados do utilizador
 
-        try{
+        try(Statement stmt = conn.createStatement()){
             String updateQuery = "UPDATE Utilizadores SET Nome = '" + editReg.getName() + "', Email = '" + editReg.getEmail() + "', Password = '" + editReg.getPassword() + "' WHERE Numero_Indentificacao = '" + editReg.getIdentificationNumber() + "'";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(updateQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            stmt.executeUpdate(updateQuery);
 
             return editReg;
 
@@ -324,22 +330,16 @@ public class conectionBD {
 
     //Eventos
 
-    //ver este ainda, nao sei se esta bem
     public String criaEvento(String designacaoEvent, String local, String data, String horaInicio, String horaFim) {
 
         //testar primeiro mas em principio mudar a data e as horas para o seu tipo de dados (data, Time)
 
-        try {
+        try(Statement stmt = conn.createStatement()) {
             if (existEvento(designacaoEvent))
                 return "Evento ja existe";
 
             String insertQuery = "INSERT INTO Eventos (Designacao,Localidade, Data, Hora_Inicio, Hora_Fim) VALUES ('" + designacaoEvent + "', '" + local + "', '" + data + "', '" + horaInicio + "', '" + horaFim + "')";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(insertQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            stmt.executeUpdate(insertQuery);
 
             return "Evento criado com sucesso";
 
@@ -348,34 +348,44 @@ public class conectionBD {
             return "Erro ao criar um evento";
         }
 
-    } // testar ->
+    } // testar -> FEITO
 
-    public events editEvento(events editEvent){
-
+    public String editEvento(events editEvent){
         // editar dados do evento se nao tiver presenças registadas
 
-        if (editEvent.getMsg() != null)
-            if (!existPresencasEvent(editEvent.getMsg())) {
-                editEvent.setMsg("Evento ja tem presenças registadas");
-                return editEvent;
-            }
+        if (editEvent.getMsg() == null)
+            return "Nome do Evento a alterar nao pode ser Null";
 
-        try{
-            String updateQuery = "UPDATE Eventos SET Designacao_Evento = '" + editEvent.getDescricao() + "', Local = '" + editEvent.getLocal() + "', Data = '" + editEvent.getData() + "', Hora_Inicio = '" + editEvent.getHoraIncio() + "', Hora_Fim = '" + editEvent.getHoraFim() + "' WHERE Designacao = '" + editEvent.getMsg() + "'";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(updateQuery);
+        if (!existEvento(editEvent.getMsg()))
+            return "Evento não existe";
 
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+        if (existPresencasEvent(editEvent.getMsg()))
+            return "Evento ja tem presencas registadas";
 
-            editEvent.setMsg("Evento editado com sucesso");
+        events auxEvent = getEvento(editEvent.getMsg());
 
-            return editEvent;
+        if (editEvent.getDescricao() == null)
+            editEvent.setDescricao(auxEvent.getDescricao());
+        if (editEvent.getLocal() == null)
+            editEvent.setLocal(auxEvent.getLocal());
+        if (editEvent.getData() == null)
+            editEvent.setData(auxEvent.getData());
+        if (editEvent.getHoraIncio() == null)
+            editEvent.setHoraIncio(auxEvent.getHoraIncio());
+        if (editEvent.getHoraFim() == null)
+            editEvent.setHoraFim(auxEvent.getHoraFim());
+
+
+
+        try(Statement stmt = conn.createStatement()) {
+            String updateQuery = "UPDATE Eventos SET Designacao = '" + editEvent.getDescricao() + "', Localidade = '" + editEvent.getLocal() + "', Data = '" + editEvent.getData() + "', Hora_Inicio = '" + editEvent.getHoraIncio() + "', Hora_Fim = '" + editEvent.getHoraFim() + "' WHERE Designacao = '" + editEvent.getMsg() + "'";
+            stmt.executeUpdate(updateQuery);
+
+            return "Evento editado com sucesso";
 
         } catch (SQLException e) {
             System.err.println("Erro ao editar evento: " + e.getMessage());
-            return null;
+            return "Erro ao editar evento";
         }
     } // testar ->
 
@@ -384,19 +394,14 @@ public class conectionBD {
         // eliminar um evento desde que nao tenha presenças associadas
 
         if (!existEvento(designacaoEvent))
-            return "Evento ja tem presenças registadas";
+            return "Evento não existe";
+        else if (existPresencasEvent(designacaoEvent))
+            return "Event ja tem presencas associadas";
 
-        try {
-            if (!existEvento(designacaoEvent))
-                return "Event ja tem presencas associadas";
+        try(Statement stmt = conn.createStatement()) {
 
-            String deleteQuery = "DELETE FROM Eventos WHERE Designacao_Evento = '" + designacaoEvent + "'";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(deleteQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            String deleteQuery = "DELETE FROM Eventos WHERE Designacao = '" + designacaoEvent + "'";
+            stmt.executeUpdate(deleteQuery);
 
             return "Evento eliminado com sucesso";
 
@@ -405,18 +410,13 @@ public class conectionBD {
             return "Erro ao eliminar evento";
         }
 
-    } // testar ->
+    } // testar -> FEITO
 
     public String eliminaPresenca(String email, String designacaoEvent){
 
-        try{
+        try(Statement stmt = conn.createStatement()){
             String deleteQuery = "DELETE FROM Presencas WHERE Evento_Designacao = '" + designacaoEvent + "' AND Utilizador_ID = '" + getID(email) + "'";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(deleteQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            stmt.executeUpdate(deleteQuery);
 
             return "Presenca eliminada com sucesso";
 
@@ -429,22 +429,16 @@ public class conectionBD {
 
     public String inserePresenca(String email, String designacaoEvent){
 
-        try {
-
             if (!existEvento(designacaoEvent))
                 return "Evento nao existe";
 
             if (existPresencas(email, designacaoEvent))
                 return "Presenca ja registada";
 
+            try(Statement stmt = conn.createStatement()) {
 
             String insertQuery = "INSERT INTO Presencas (Evento_Designacao,Utilizador_ID) VALUES ('" + designacaoEvent + "','" + getID(email) + "')";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(insertQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            stmt.executeUpdate(insertQuery);
 
             return "Presenca registada com sucesso";
 
@@ -493,14 +487,9 @@ public class conectionBD {
 
         int codigo = (int)(Math.random() * 100000);
 
-        try {
+        try(Statement stmt = conn.createStatement()) {
             String insertQuery = "INSERT INTO Codigos (Codigo,Tempo_Limite,Evento_Designacao) VALUES ('" + codigo + "','" + tempoLimite + "', '" + designacaoEvent + "')";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(insertQuery);
-
-            // Fechar recursos
-            rs.close();
-            stmt.close();
+            stmt.executeUpdate(insertQuery);
 
             return "Codigo gerado com sucesso -> " + codigo;
 
@@ -509,6 +498,44 @@ public class conectionBD {
             return "Erro ao gerar codigo";
         }
 
+    } // testar ->
+
+    //Versao
+
+    public static int getVersion() {
+
+        try(Statement stmt = conn.createStatement()){
+
+            String selectQuery = "SELECT * FROM Versao";
+            ResultSet rs = stmt.executeQuery(selectQuery);
+
+            // Verificar se há algum resultado
+            int versao = rs.getInt("numero_versao");
+
+            // Fechar recursos
+            rs.close();
+
+            return versao;
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar Numero da versao : " + e.getMessage());
+            return -1;
+
+        }
+
+
+    } // testar ->
+
+    public void updateVersion() {
+
+        try (Statement stmt = conn.createStatement()) {
+
+            String updateQuery = "UPDATE Versao SET numero_versao = '" + (getVersion() + 1) + "'";
+            stmt.executeUpdate(updateQuery);
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao dar Update do numero da versao : " + e.getMessage());
+        }
     } // testar ->
 
 }

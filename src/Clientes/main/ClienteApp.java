@@ -18,7 +18,6 @@ public class ClienteApp {
         Scanner sc = new Scanner(System.in);
         ClientCommunication communication;
 
-
         String serverAddress = args[0];
         int serverPort = Integer.parseInt(args[1]);
 
@@ -33,7 +32,7 @@ public class ClienteApp {
 
             int escolha;
             do {
-                System.out.println("Bem-vindo! Escolha uma opção:");
+                System.out.println("\nBem-vindo! Escolha uma opção:");
                 System.out.println("1. Registrar");
                 System.out.println("2. Fazer Login");
                 System.out.println("3. Sair");
@@ -92,7 +91,7 @@ public class ClienteApp {
 
                 while (isLoggedIn) {
                     if (isAdmin) {
-                        System.out.println("Menu de Administrador:");
+                        System.out.println("\nMenu de Administrador:");
                         System.out.println("1. Criar Evento");
                         System.out.println("2. Editar Evento");
                         System.out.println("3. Eliminar Evento");
@@ -106,7 +105,7 @@ public class ClienteApp {
                         System.out.println("11. Logout");
                     }
                     else{
-                        System.out.println("Menu de Utilizador:");
+                        System.out.println("\nMenu de Utilizador:");
                         System.out.println("1. Editar dados de Registo");
                         System.out.println("2. Submeter código de registo da presença");
                         System.out.println("3. Consultar presenças registadas");
@@ -142,11 +141,13 @@ public class ClienteApp {
                                 }
                                 break;
                             case 2:
+                                System.out.print("Nome do evento a alterar: ");
+                                String alteraEvento = sc.nextLine();
                                 System.out.print("Novo nome do evento (deixe em branco para não alterar): ");
                                 String novoNomeEvento = sc.nextLine();
                                 System.out.print("Novo local (deixe em branco para não alterar): ");
                                 String novoLocalEvento = sc.nextLine();
-                                System.out.print("Nova data (AAAA/MM/DD, deixe em branco para não alterar): ");
+                                System.out.print("Nova data (AAAA-MM-DD, deixe em branco para não alterar): ");
                                 String novaDataEvento = sc.nextLine();
                                 System.out.print("Nova hora de início (HH:MM, deixe em branco para não alterar): ");
                                 String novaHoraInicio = sc.nextLine();
@@ -154,7 +155,7 @@ public class ClienteApp {
                                 String novaHoraFim = sc.nextLine();
 
                                 events updatedEvent = new events(novoNomeEvento, novoLocalEvento, novaDataEvento, novaHoraInicio, novaHoraFim);
-                                updatedEvent.setMsg("edit"); // confirmar se é necessário
+                                updatedEvent.setMsg(alteraEvento);
 
                                 try {
                                     String response = communication.updateEvent(updatedEvent);
@@ -163,7 +164,7 @@ public class ClienteApp {
                                     System.out.println("Erro ao editar dados do evento: " + e.getMessage());
                                 }
                                 break;
-                            case 3: // O evento não pode ter nenhuma presença registada
+                            case 3:
                                 System.out.print("Descrição do evento a eliminar: ");
                                 String descricaoEvento = sc.nextLine();
 

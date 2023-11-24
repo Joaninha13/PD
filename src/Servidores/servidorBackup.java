@@ -19,9 +19,9 @@ public class servidorBackup {
         Path dirRepBd = Paths.get(args[1]);
 
         //verifica se a diretoria não está vazia
-        if((isEmptyDirectory = Files.list(dirRepBd).findAny().isPresent()) == false){
+       /* if((isEmptyDirectory = Files.list(dirRepBd).findAny().isPresent()) == false){
             System.out.println("Diretoria não está vazia!\n");
             return;
-        }
+        }*/
     }
 }

@@ -6,7 +6,7 @@ public class registo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private String identificationNumber;
+    private int identificationNumber;
     private String email;
     private String password;
     private String msg;
@@ -27,11 +27,11 @@ public class registo implements Serializable {
         this.name = name;
     }
 
-    public String getIdentificationNumber() {
+    public int getIdentificationNumber() {
         return identificationNumber;
     }
 
-    public void setIdentificationNumber(String identificationNumber) {this.identificationNumber = identificationNumber;}
+    public void setIdentificationNumber(int identificationNumber) {this.identificationNumber = identificationNumber;}
 
     public String getEmail() {
         return email;
@@ -64,7 +64,6 @@ public class registo implements Serializable {
     public void setRegistered(boolean registered) {
         isRegistered = registered;
     }
-
 
     @Override
     public String toString() {

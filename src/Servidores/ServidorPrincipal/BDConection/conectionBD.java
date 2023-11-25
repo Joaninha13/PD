@@ -496,19 +496,46 @@ public class conectionBD {
                     System.out.println("-----------------------");
 
                     consulta.getEvent().add(new events(rs.getString("Evento_Designacao"), rs.getString("Localidade"), rs.getString("Data"), rs.getString("Hora_Inicio"), rs.getString("Hora_Fim")));
-
                 }
             }
         } catch (SQLException e) {
             System.err.println("Erro ao consultar presenças do utilizador: " + e.getMessage());
+            return null;
         }
+        return consulta;
     }
 
     //Consulta de presencas de um evento
-    public void consultaPresencasEvento(String designacaoEvent, String filtro){}
+    public ConsultPresence consultaPresencasEvento(String designacaoEvent){
+        ConsultPresence consulta = new ConsultPresence();
+
+        try (Statement stmt = conn.createStatement()) {
+            String selectQuery = "SELECT U.Nome, U.Email, U.Numero_Indentificacao " +
+                    "FROM Presencas P " +
+                    "JOIN Eventos E ON P.Evento_Designacao = E.Designacao " +
+                    "JOIN Utilizadores U ON P.Utilizador_ID = U.Numero_Indentificacao " +
+                    "WHERE E.Designacao = '" + designacaoEvent + "'";
+
+            try (ResultSet rs = stmt.executeQuery(selectQuery)) {
+                while (rs.next()) {
+                    // Aqui você pode processar os resultados, por exemplo, imprimindo no console
+                     System.out.println("Nome: " + rs.getString("Nome"));
+                        System.out.println("Email: " + rs.getString("Email"));
+                        System.out.println("Numero de Identificacao: " + rs.getInt("Numero_Indentificacao"));
+
+                    consulta.getReg().add(new registo(rs.getString("Nome"), rs.getString("Email"), null));
+                    consulta.getReg().get(consulta.getReg().size() - 1).setIdentificationNumber(rs.getInt("Numero_Indentificacao"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao consultar presenças do evento: " + e.getMessage());
+            return null;
+        }
+        return consulta;
+    }
 
     //consulta de eventos criados
-    public void consultaEventos(String filtro){}
+    public ConsultPresence consultaEventos(String filtro){}
 
 
     //Codigos

@@ -223,7 +223,7 @@ public class ClienteApp {
                                 System.out.print("Novo número de identificação: ");
                                 String newIdNumber = sc.nextLine();
                                 if (!newIdNumber.isEmpty()) {
-                                    currentUser.setIdentificationNumber(newIdNumber);
+                                    currentUser.setIdentificationNumber(Integer.parseInt(newIdNumber));
                                 }
 
                                 System.out.println("Email atual: " + currentUser.getEmail());

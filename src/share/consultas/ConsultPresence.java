@@ -19,9 +19,9 @@ public class ConsultPresence implements Serializable {
         event = new ArrayList<>();
     }
 
-    public List<registo> getLog() {return reg;}
+    public List<registo> getReg() {return reg;}
 
-    public void setLog(List<registo> reg) {this.reg = reg;}
+    public void setReg(List<registo> reg) {this.reg = reg;}
 
     public List<events> getEvent() {return event;}
 

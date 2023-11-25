@@ -151,7 +151,7 @@ public class conectionClientThread extends Thread{
                 else if (parts[0].equals("ConsultPesencaEvent")) {
                     //consultar presenças num determinado evento
 
-                    oout.writeObject();
+                    oout.writeObject(bd.consultaPresencasEvento(parts[1]));
                     oout.flush();
                 }
 

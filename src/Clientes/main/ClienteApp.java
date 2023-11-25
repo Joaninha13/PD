@@ -56,6 +56,7 @@ public class ClienteApp {
                         if (responseRegister.isRegistered()) {
                             System.out.println(responseRegister.getMsg());
                             isLoggedIn = true;
+                            currentUser = responseRegister;
                         } else {
                             System.out.println("Erro no registo: " + responseRegister.getMsg());
                         }
@@ -221,7 +222,6 @@ public class ClienteApp {
                                 String userEmail = sc.nextLine();
                                 try {
                                     ConsultPresence userEvents = communication.consultUserEvents(userEmail);
-                                    // Aqui você pode imprimir os detalhes dos eventos
                                     for (events e : userEvents.getEvent()) {
                                         System.out.println(e.toString());
                                     }
@@ -266,7 +266,7 @@ public class ClienteApp {
                     else{
                         switch (opcao) {
                             case 1:
-                                System.out.println("Editar dados de registro. Deixe em branco se não deseja mudar o valor atual:");
+                                System.out.println("Editar dados de registo. Deixe em branco se não deseja mudar o valor atual:");
 
                                 System.out.println("Nome atual: " + currentUser.getName());
                                 System.out.print("Novo nome: ");

@@ -64,4 +64,14 @@ public class registo implements Serializable {
     public void setRegistered(boolean registered) {
         isRegistered = registered;
     }
+
+
+    @Override
+    public String toString() {
+        return "registo{" +
+                "name='" + name + '\'' +
+                ", identificationNumber='" + identificationNumber + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

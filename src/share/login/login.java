@@ -56,4 +56,6 @@ public class login implements Serializable {
     public void setAdmin(boolean admin) {
         isAdmin = admin;
     }
+
+
 }

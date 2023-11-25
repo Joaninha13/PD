@@ -1,7 +1,7 @@
 package share.consultas;
 
 import share.events.events;
-import share.login.login;
+import share.registo.registo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,17 +11,17 @@ public class ConsultPresence implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private List<login> log;
+    private List<registo> reg;
     private List<events> event;
 
     public ConsultPresence() {
-        log = new ArrayList<>();
+        reg = new ArrayList<>();
         event = new ArrayList<>();
     }
 
-    public List<login> getLog() {return log;}
+    public List<registo> getLog() {return reg;}
 
-    public void setLog(List<login> log) {this.log = log;}
+    public void setLog(List<registo> reg) {this.reg = reg;}
 
     public List<events> getEvent() {return event;}
 

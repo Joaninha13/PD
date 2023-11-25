@@ -497,7 +497,6 @@ public class conectionBD {
 
                     consulta.getEvent().add(new events(rs.getString("Evento_Designacao"), rs.getString("Localidade"), rs.getString("Data"), rs.getString("Hora_Inicio"), rs.getString("Hora_Fim")));
 
-
                 }
             }
         } catch (SQLException e) {

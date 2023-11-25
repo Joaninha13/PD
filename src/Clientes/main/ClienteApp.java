@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 import Clientes.communication.ClientCommunication;
+import share.consultas.ConsultPresence;
 import share.login.login;
 import share.registo.registo;
 import share.events.events;
@@ -173,8 +174,19 @@ public class ClienteApp {
                                     System.out.println("Erro ao eliminar evento: " + e.getMessage());
                                 }
                                 break;
-                            //case 4:
-                                //confirmar parametros
+                            case 4:
+                                System.out.println("Consultar Eventos. Insira filtros se necessário:");
+                                String filtro = sc.nextLine();
+
+                                try {
+                                    ConsultPresence consulta = communication.consultEvents(filtro);
+                                    for (events e : consulta.getEvent()) {
+                                        System.out.println(e.toString());
+                                    }
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao consultar eventos: " + e.getMessage());
+                                }
+                                break;
                             case 5:
                                 System.out.print("Descrição do evento para o qual gerar o código: ");
                                 String descEvento = sc.nextLine();
@@ -189,13 +201,58 @@ public class ClienteApp {
                                     System.out.println("Erro ao gerar código de presença: " + e.getMessage());
                                 }
                                 break;
-                            //case 6:
-                                //mandar string ou uma estrutura ??
+                            case 6:
+                                System.out.print("Insira o nome do evento para consultar as presenças: ");
+                                String eventName = sc.nextLine();
+                                try {
+                                    ConsultPresence presence = communication.consultPresenceInEvent(eventName);
+                                    for (registo reg : presence.getReg()) {
+                                        System.out.println(reg.toString());
+                                    }
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao consultar presenças: " + e.getMessage());
+                                }
+                                break;
+
                             //case 7:
                                 //ficheiro com o ficheiro csv
-                            //case 8:
-                                //mesmo que o case 6
-
+                            case 8:
+                                System.out.print("Insira o email do utilizador para consultar os seus eventos: ");
+                                String userEmail = sc.nextLine();
+                                try {
+                                    ConsultPresence userEvents = communication.consultUserEvents(userEmail);
+                                    // Aqui você pode imprimir os detalhes dos eventos
+                                    for (events e : userEvents.getEvent()) {
+                                        System.out.println(e.toString());
+                                    }
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao consultar eventos do utilizador: " + e.getMessage());
+                                }
+                                break;
+                            case 9:
+                                System.out.print("Insira o email do utilizador: ");
+                                userEmail = sc.nextLine();
+                                System.out.print("Insira a designação do evento: ");
+                                eventName = sc.nextLine();
+                                try {
+                                    String response = communication.deleteRegisteredAttendance(userEmail, eventName);
+                                    System.out.println("Resposta do servidor: " + response);
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao eliminar presenças registadas: " + e.getMessage());
+                                }
+                                break;
+                            case 10:
+                                System.out.print("Insira o email do utilizador: ");
+                                userEmail = sc.nextLine();
+                                System.out.print("Insira a designação do evento: ");
+                                eventName = sc.nextLine();
+                                try {
+                                    String response = communication.insertAttendance(userEmail, eventName);
+                                    System.out.println("Resposta do servidor: " + response);
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao inserir presença: " + e.getMessage());
+                                }
+                                break;
                             case 11:
                                 isLoggedIn = false;
                                 isAdmin = false;
@@ -269,13 +326,17 @@ public class ClienteApp {
                                 String filter = sc.nextLine();
 
                                 try {
-                                    String attendanceResponse = communication.consultAttendance(currentUser.getEmail(), filter);
+                                    ConsultPresence attendanceResponse = communication.consultAttendance(currentUser.getEmail(), filter);
                                     System.out.println("Resposta do servidor: " + attendanceResponse);
+
+                                    attendanceResponse.getReg().forEach(reg -> System.out.println(reg.toString()));
+                                    attendanceResponse.getEvent().forEach(event -> System.out.println(event.toString()));
                                 } catch (IOException | ClassNotFoundException e) {
                                     System.out.println("Erro ao consultar presenças: " + e.getMessage());
                                 }
                                 break;
-                           // case 4:
+
+                            // case 4:
                                 //ficheiro com o ficheiro csv
                             case 9:
                                 isLoggedIn = false;

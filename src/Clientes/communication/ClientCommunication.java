@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import share.consultas.ConsultPresence;
 import share.events.events;
 import share.login.login;
 import share.registo.registo;
@@ -76,7 +77,7 @@ public class ClientCommunication {
         }
     }
 
-    public String consultAttendance(String email, String filter) throws IOException, ClassNotFoundException {
+    public ConsultPresence consultAttendance(String email, String filter) throws IOException, ClassNotFoundException {
         try (Socket socket = new Socket(serverAddr, serverPort);
              ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
@@ -89,7 +90,7 @@ public class ClientCommunication {
             oout.writeObject(message);
             oout.flush();
 
-            return (String) oin.readObject();
+            return (ConsultPresence) oin.readObject();
         }
     }
 
@@ -136,6 +137,74 @@ public class ClientCommunication {
              ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
 
             String message = "gerar " + descEvento + " " + tempoValidade;
+            oout.writeObject(message);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
+    public ConsultPresence consultEvents(String filter) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "ConsultEvents";
+            if (filter != null && !filter.isEmpty()) {
+                message += " " + filter;
+            }
+            oout.writeObject(message);
+            oout.flush();
+
+            return (ConsultPresence) oin.readObject();
+        }
+    }
+
+    public ConsultPresence consultPresenceInEvent(String eventName) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "ConsultPesencaEvent " + eventName;
+            oout.writeObject(message);
+            oout.flush();
+
+            return (ConsultPresence) oin.readObject();
+        }
+    }
+
+    public ConsultPresence consultUserEvents(String userEmail) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "consultPresenca " + userEmail;
+            oout.writeObject(message);
+            oout.flush();
+
+            return (ConsultPresence) oin.readObject();
+        }
+    }
+
+    public String deleteRegisteredAttendance(String email, String eventName) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "checkout " + email + " " + eventName;
+            oout.writeObject(message);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
+    public String insertAttendance(String email, String eventName) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "checkin " + email + " " + eventName;
             oout.writeObject(message);
             oout.flush();
 

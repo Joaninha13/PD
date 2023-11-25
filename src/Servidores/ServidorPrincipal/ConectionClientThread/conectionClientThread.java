@@ -142,9 +142,23 @@ public class conectionClientThread extends Thread{
                     oout.flush();
                 }
                 else if (parts[0].equals("ConsultPresenca")) {
-                    //gerar codigo
+                    //consultar presenças de um utilizador
 
-                    oout.writeObject(bd.geraCodigo(parts[1], parts[2]));
+                    oout.writeObject(bd.consultaPresencasUtilizador(parts[1], parts[2]));
+                    oout.flush();
+                }
+
+                else if (parts[0].equals("ConsultPesencaEvent")) {
+                    //consultar presenças num determinado evento
+
+                    oout.writeObject();
+                    oout.flush();
+                }
+
+                else if (parts[0].equals("ConsultEvents")) {
+                    //consultar eventos criados com filtro
+
+                    oout.writeObject();
                     oout.flush();
                 }
 

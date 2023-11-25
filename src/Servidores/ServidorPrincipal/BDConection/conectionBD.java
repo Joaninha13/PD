@@ -1,5 +1,6 @@
 package Servidores.ServidorPrincipal.BDConection;
 
+import share.consultas.ConsultPresence;
 import share.events.events;
 import share.registo.registo;
 
@@ -353,7 +354,7 @@ public class conectionBD {
     public String editEvento(events editEvent){
         // editar dados do evento se nao tiver presenças registadas
 
-        if (editEvent.getMsg() == null)
+        if (editEvent.getMsg() == null || editEvent.getMsg().equals(""))
             return "Nome do Evento a alterar nao pode ser Null";
 
         if (!existEvento(editEvent.getMsg()))
@@ -474,8 +475,40 @@ public class conectionBD {
 
 
     //Consultas
-    public void consultaPresencasUtilizador(String email, String filtro){}
+    public ConsultPresence consultaPresencasUtilizador(String email, String filtro){
+        ConsultPresence consulta = new ConsultPresence();
+
+        try (Statement stmt = conn.createStatement()) {
+            String selectQuery = "SELECT P.Evento_Designacao, E.Localidade, E.Data, E.Hora_Inicio, E.Hora_Fim " +
+                    "FROM Presencas P " +
+                    "JOIN Eventos E ON P.Evento_Designacao = E.Designacao " +
+                    "JOIN Utilizadores U ON P.Utilizador_ID = U.Numero_Indentificacao " +
+                    "WHERE U.Email = '" + email + "' AND (E.Data LIKE '%" + filtro + "%' OR E.Localidade LIKE '%" + filtro + "%' OR E.Hora_Inicio LIKE '%" + filtro + "%' OR E.Hora_Fim LIKE '%" + filtro + "%')";
+
+            try (ResultSet rs = stmt.executeQuery(selectQuery)) {
+                while (rs.next()) {
+                    // Aqui você pode processar os resultados, por exemplo, imprimindo no console
+                    System.out.println("Evento: " + rs.getString("Evento_Designacao"));
+                    System.out.println("Localidade: " + rs.getString("Localidade"));
+                    System.out.println("Data: " + rs.getDate("Data"));
+                    System.out.println("Hora Início: " + rs.getTime("Hora_Inicio"));
+                    System.out.println("Hora Fim: " + rs.getTime("Hora_Fim"));
+                    System.out.println("-----------------------");
+
+                    consulta.getEvent().add(new events(rs.getString("Evento_Designacao"), rs.getString("Localidade"), rs.getString("Data"), rs.getString("Hora_Inicio"), rs.getString("Hora_Fim")));
+
+
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao consultar presenças do utilizador: " + e.getMessage());
+        }
+    }
+
+    //Consulta de presencas de um evento
     public void consultaPresencasEvento(String designacaoEvent, String filtro){}
+
+    //consulta de eventos criados
     public void consultaEventos(String filtro){}
 
 

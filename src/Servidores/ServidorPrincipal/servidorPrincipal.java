@@ -51,9 +51,9 @@ public class servidorPrincipal{
             MulticastSocket ms = new MulticastSocket(PORT);
             InetAddress ipGroup = InetAddress.getByName(ADDRESS);
 
-            new RmiService(args[2], Integer.parseInt(args[3]), DBDirectory).start();
+            //new RmiService(args[2], Integer.parseInt(args[3]), DBDirectory).start();
 
-            new HeartBeat(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT).start();
+            //new HeartBeat(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT).start();
 
             System.out.println("TCP Server iniciado no porto " + socket.getLocalPort() + " ...");
 

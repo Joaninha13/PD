@@ -60,26 +60,14 @@ public class conectionClientThread extends Thread{
 
                 reg = (registo) obj;
 
-
-                if (reg.getMsg()!=null && reg.getMsg().equalsIgnoreCase("edit")){
+                if (reg.getMsg() != null && reg.getMsg().equalsIgnoreCase("edit")){
                     //editar dados do utilizador
                     oout.writeObject(bd.editCliente(reg));
                     oout.flush();
                 }
-                else if (!bd.registaCliente(reg)) {
-                    reg.setRegistered(false);
-                    reg.setMsg("Email ja se encontra registrado");
 
-                }
-                else {
-                    reg.setRegistered(true);
-                    reg.setMsg("Registo efetuado com sucesso");
-                }
-
-                oout.writeObject(reg);
+                oout.writeObject(bd.registaCliente(reg));
                 oout.flush();
-
-                System.out.println("Mandei class registo");
 
             }
             else if (obj instanceof events) {

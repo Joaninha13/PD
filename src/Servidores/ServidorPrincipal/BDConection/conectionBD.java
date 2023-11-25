@@ -301,23 +301,30 @@ public class conectionBD {
         }
     } // testar - > FEITO
 
-    public boolean registaCliente(registo reg){
+    public registo registaCliente(registo reg){
 
-        if (autenticaCliente(reg.getEmail(), reg.getPassword()))
-            return false;
+        if (autenticaCliente(reg.getEmail(), reg.getPassword())) {
+            reg.setRegistered(false);
+            reg.setMsg("Email ja se encontra registrado");
+            return null;
+        }
 
         try(Statement stmt = conn.createStatement()) {
             String insertQuery = "INSERT INTO Utilizadores (Numero_Indentificacao,Nome, Email, Password) VALUES ('" + getIDUtilizador() + "','" + reg.getName() + "', '" + reg.getEmail() + "', '" + reg.getPassword() + "')";
             stmt.executeUpdate(insertQuery);
 
+            reg.setIdentificationNumber(getIDUtilizador());
+            reg.setRegistered(true);
+            reg.setMsg("Registo efetuado com sucesso");
             incrementIDUtilizador();
 
             updateVersion();
-            return true;
+            return reg;
 
         } catch (SQLException e) {
             System.err.println("Erro ao registar utilizador: " + e.getMessage());
-            return false;
+            reg.setRegistered(false);
+            return null;
         }
     } //testar ->
 
@@ -507,9 +514,9 @@ public class conectionBD {
                     // Aqui você pode processar os resultados, por exemplo, imprimindo no console
                     System.out.println("Evento: " + rs.getString("Evento_Designacao"));
                     System.out.println("Localidade: " + rs.getString("Localidade"));
-                    System.out.println("Data: " + rs.getDate("Data"));
-                    System.out.println("Hora Início: " + rs.getTime("Hora_Inicio"));
-                    System.out.println("Hora Fim: " + rs.getTime("Hora_Fim"));
+                    System.out.println("Data: " + rs.getString("Data"));
+                    System.out.println("Hora Início: " + rs.getString("Hora_Inicio"));
+                    System.out.println("Hora Fim: " + rs.getString("Hora_Fim"));
                     System.out.println("-----------------------");
 
                     consulta.getEvent().add(new events(rs.getString("Evento_Designacao"), rs.getString("Localidade"), rs.getString("Data"), rs.getString("Hora_Inicio"), rs.getString("Hora_Fim")));
@@ -564,9 +571,9 @@ public class conectionBD {
                     // Aqui você pode processar os resultados, por exemplo, imprimindo no console
                     System.out.println("Evento: " + rs.getString("Designacao"));
                     System.out.println("Localidade: " + rs.getString("Localidade"));
-                    System.out.println("Data: " + rs.getDate("Data"));
-                    System.out.println("Hora Início: " + rs.getTime("Hora_Inicio"));
-                    System.out.println("Hora Fim: " + rs.getTime("Hora_Fim"));
+                    System.out.println("Data: " + rs.getString("Data"));
+                    System.out.println("Hora Início: " + rs.getString("Hora_Inicio"));
+                    System.out.println("Hora Fim: " + rs.getString("Hora_Fim"));
                     System.out.println("-----------------------");
 
                     consulta.getEvent().add(new events(rs.getString("Designacao"), rs.getString("Localidade"), rs.getString("Data"), rs.getString("Hora_Inicio"), rs.getString("Hora_Fim")));
@@ -588,7 +595,7 @@ public class conectionBD {
         int codigo = (int)(Math.random() * 100000);
 
         try(Statement stmt = conn.createStatement()) {
-            String insertQuery = "INSERT INTO Codigos (Codigo,Tempo_Limite,Evento_Designacao) VALUES ('" + codigo + "','" + tempoLimite + "', '" + designacaoEvent + "')";
+            String insertQuery = "INSERT INTO Codigo_Registo (codigo,Tempo,Evento_Designacao) VALUES ('" + codigo + "','" + tempoLimite + "', '" + designacaoEvent + "')";
             stmt.executeUpdate(insertQuery);
 
             return "Codigo gerado com sucesso -> " + codigo;

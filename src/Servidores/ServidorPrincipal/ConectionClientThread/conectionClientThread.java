@@ -158,7 +158,7 @@ public class conectionClientThread extends Thread{
                 else if (parts[0].equals("ConsultEvents")) {
                     //consultar eventos criados com filtro
 
-                    oout.writeObject();
+                    oout.writeObject(bd.consultaEventos(parts[1]));
                     oout.flush();
                 }
 

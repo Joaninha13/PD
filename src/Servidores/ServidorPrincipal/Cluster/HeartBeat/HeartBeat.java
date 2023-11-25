@@ -23,7 +23,6 @@ public class HeartBeat  extends Thread implements HearBeatInterface {
     private boolean terminate;
 
 
-
     public HeartBeat(String serviceNameRMI, int listeningPortRMI, MulticastSocket ms, InetAddress ipGroup, int port){
         this.listeningPortRMI = listeningPortRMI;
         this.serviceNameRMI = serviceNameRMI;

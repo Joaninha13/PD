@@ -205,7 +205,6 @@ public class RmiService extends UnicastRemoteObject implements IRmiService {
             notifyBackUpServers("Exceçao ao aceder para a leitura ao ficheiro " + fileName);
             throw new IOException("Exceçao eo abrir o ficheiro " + fileName, e.getCause());
         }
-
     }
 
     @Override

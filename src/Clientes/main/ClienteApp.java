@@ -56,6 +56,7 @@ public class ClienteApp {
                         if (responseRegister.isRegistered()) {
                             System.out.println(responseRegister.getMsg());
                             isLoggedIn = true;
+                            currentUser = responseRegister;
                         } else {
                             System.out.println("Erro no registo: " + responseRegister.getMsg());
                         }

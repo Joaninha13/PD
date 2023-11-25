@@ -130,6 +130,19 @@ public class ClientCommunication {
         }
     }
 
+    public String generatePresenceCode(String descEvento, int tempoValidade) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket(serverAddr, serverPort);
+             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
+
+            String message = "gerar " + descEvento + " " + tempoValidade;
+            oout.writeObject(message);
+            oout.flush();
+
+            return (String) oin.readObject();
+        }
+    }
+
     public boolean isConnected() {
         try {
             if (!socket.isConnected()) {

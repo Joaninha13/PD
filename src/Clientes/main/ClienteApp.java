@@ -44,14 +44,12 @@ public class ClienteApp {
                     case 1:
                         System.out.println("Introduza o seu nome:");
                         String nome = sc.nextLine();
-                        System.out.println("Introduza o seu numero de identificação:");
-                        String numID = sc.nextLine();
                         System.out.println("Introduza o seu email:");
                         String email = sc.nextLine();
                         System.out.println("Introduza a sua password:");
                         String password = sc.nextLine();
 
-                        registo userRegister = new registo(nome, numID, email, password);
+                        registo userRegister = new registo(nome,email,password);
                         registo responseRegister = communication.registerUser(userRegister);
 
                         if (responseRegister.isRegistered()) {
@@ -175,6 +173,29 @@ public class ClienteApp {
                                     System.out.println("Erro ao eliminar evento: " + e.getMessage());
                                 }
                                 break;
+                            //case 4:
+                                //confirmar parametros
+                            case 5:
+                                System.out.print("Descrição do evento para o qual gerar o código: ");
+                                String descEvento = sc.nextLine();
+                                System.out.print("Tempo de validade do código (em minutos): ");
+                                int tempoValidade = sc.nextInt();
+                                sc.nextLine();
+
+                                try {
+                                    String response = communication.generatePresenceCode(descEvento, tempoValidade);
+                                    System.out.println("Código de presença gerado: " + response);
+                                } catch (IOException | ClassNotFoundException e) {
+                                    System.out.println("Erro ao gerar código de presença: " + e.getMessage());
+                                }
+                                break;
+                            //case 6:
+                                //mandar string ou uma estrutura ??
+                            //case 7:
+                                //ficheiro com o ficheiro csv
+                            //case 8:
+                                //mesmo que o case 6
+
                             case 11:
                                 isLoggedIn = false;
                                 isAdmin = false;
@@ -254,7 +275,8 @@ public class ClienteApp {
                                     System.out.println("Erro ao consultar presenças: " + e.getMessage());
                                 }
                                 break;
-
+                           // case 4:
+                                //ficheiro com o ficheiro csv
                             case 9:
                                 isLoggedIn = false;
                                 currentUser = null;

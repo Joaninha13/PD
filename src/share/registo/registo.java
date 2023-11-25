@@ -12,9 +12,8 @@ public class registo implements Serializable {
     private String msg;
     private boolean isRegistered;
 
-    public registo(String name, String identificationNumber, String email, String password) {
+    public registo(String name, String email, String password) {
         this.name = name;
-        this.identificationNumber = identificationNumber;
         this.email = email;
         this.password = password;
         this.isRegistered = false;

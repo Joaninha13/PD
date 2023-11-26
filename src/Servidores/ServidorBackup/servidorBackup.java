@@ -74,11 +74,11 @@ public class servidorBackup {
             mskt = new MulticastSocket(PORT);
             mskt.joinGroup(new InetSocketAddress(ADDRESS, PORT),nif);
             mchat = new MulticastChat("S", mskt);
+
             mchat.start();
+            mchat.join();
 
             new RmiServiceCli("sv", PORT, DBRDirectory, filepath, objectUrl).start();
-
-            while (true){}
 
         } finally {
             if (mchat != null) {

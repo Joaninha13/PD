@@ -37,14 +37,7 @@ public class conectionClientThread extends Thread{
             Object obj = oin.readObject();
 
             // talvez mudar estes dois primeiros ifs para so mandar uma mensagem a dizer que o foi bem sucedido o não!!
-            if (obj instanceof login) {
-
-                log = (login) obj;
-
-                oout.writeObject(bd.autenticaCliente(log.getEmail(), log.getPass()));
-                oout.flush();
-            }
-            else if (obj instanceof registo) {
+            if (obj instanceof registo) {
 
                 reg = (registo) obj;
 
@@ -76,7 +69,12 @@ public class conectionClientThread extends Thread{
 
                 //verificar se o primeiro elemento é um comando
 
-                if (parts[0].equals("sub")){
+                if (parts[0].equals("login")){
+
+                    oout.writeObject(bd.autenticaCliente(parts[1], parts[2]));
+                    oout.flush();
+                }
+               else if (parts[0].equals("sub")){
                     //adicionar o utilizador a lista de presenças do evento
 
                     oout.writeObject(bd.registaPresenca(parts[1], parts[2]));
@@ -134,7 +132,11 @@ public class conectionClientThread extends Thread{
                 else if (parts[0].equals("ConsultEvents")) {
                     //consultar eventos criados com filtro
 
-                    oout.writeObject(bd.consultaEventos(parts[1]));
+                    //if (parts.length == 1)
+                        //oout.writeObject(bd.consultaEventos(""));
+                    //else
+                        oout.writeObject(bd.consultaEventos(parts[1]));
+
                     oout.flush();
                 }
 

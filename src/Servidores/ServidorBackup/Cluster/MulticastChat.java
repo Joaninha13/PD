@@ -37,9 +37,12 @@ public class MulticastChat extends Thread {
         try {
 
             while (running) {
+                System.out.println("entrei no while");
 
-                pkt = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE   );
+                pkt = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
                 s.receive(pkt);
+
+                System.out.println("recebi packet");
 
                 try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(pkt.getData(), 0, pkt.getLength()))) {
 

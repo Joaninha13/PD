@@ -128,7 +128,7 @@ public class conectionBD {
     private String getDesignacaoEvent(String codigo) {
 
         try(Statement stmt = conn.createStatement()) {
-            String selectQuery = "SELECT * FROM Codigos WHERE Codigo = '" + codigo + "'";
+            String selectQuery = "SELECT * FROM Codigo_Registo WHERE Codigo = '" + codigo + "'";
             ResultSet rs = stmt.executeQuery(selectQuery);
 
             // Verificar se há algum resultado
@@ -210,13 +210,13 @@ public class conectionBD {
         //verificar se existe codigo e se o tempo de limite ainda esta dentro do tempo limite
 
         try(Statement stmt = conn.createStatement()) {
-            String selectQuery = "SELECT * FROM Codigos WHERE Codigo = '" + codigo + "'";
+            String selectQuery = "SELECT * FROM Codigo_Registo WHERE Codigo = '" + codigo + "'";
             ResultSet rs = stmt.executeQuery(selectQuery);
 
             // Verificar se há algum resultado
             boolean existe = rs.next();
 
-            if(existe && rs.getInt("Tempo_Limite") == 0)
+            if(existe && rs.getInt("Tempo") == 0)
                 return false;
 
             // Fechar recursos
@@ -229,6 +229,41 @@ public class conectionBD {
         }
 
     }
+
+    private boolean verificaCodigoEvent(String designacaoEvent){
+        //verificar se existe um codigo ja associado a um evento
+
+        try(Statement stmt = conn.createStatement()) {
+            String selectQuery = "SELECT * FROM Codigo_Registo WHERE Evento_Designacao = '" + designacaoEvent + "'";
+            ResultSet rs = stmt.executeQuery(selectQuery);
+
+            // Verificar se há algum resultado
+            boolean existe = rs.next();
+
+            // Fechar recursos
+            rs.close();
+
+            return existe;
+        } catch (SQLException e) {
+            System.err.println("Erro ao verificar se codigo existe: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private String updateCodigo(String designacaoEvent, String tempoLimite, int codigo){
+
+        try(Statement stmt = conn.createStatement()) {
+            String updateQuery = "UPDATE Codigo_Registo SET codigo = '" + codigo + "', Tempo = '" + tempoLimite + "' WHERE Evento_Desifnacao = '" + designacaoEvent + "'";
+            stmt.executeUpdate(updateQuery);
+
+            return "Codigo editado com sucesso -> " + codigo;
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao editar codigo: " + e.getMessage());
+            return "Erro ao editar codigo";
+        }
+
+    } // testar ->
 
     private boolean verificaEmail(String email) {
 
@@ -297,7 +332,6 @@ public class conectionBD {
     }   // vai a base de dados buscar o ultimo utilizador registado e retorna o seu id
 
 
-
     //Utilizadores
 
     public registo autenticaCliente(String email, String password){
@@ -326,6 +360,12 @@ public class conectionBD {
 
     public registo registaCliente(registo reg){
 
+        if (reg.getEmail().isEmpty() || reg.getPassword().isEmpty()) {
+            reg.setRegistered(false);
+            reg.setMsg("Email ou Password nao podem ser Null");
+            return null;
+        }
+
         if (verificaEmail(reg.getEmail())) {
             reg.setRegistered(false);
             reg.setMsg("Email ja se encontra registrado");
@@ -351,8 +391,6 @@ public class conectionBD {
         }
     } //testar ->
 
-    public void consultaCliente(String email){}
-
     public registo editCliente(registo editReg){
 
         // editar dados do utilizador
@@ -369,6 +407,9 @@ public class conectionBD {
             return null;
         }
     } // testar ->
+
+    public void consultaCliente(String email){}
+
 
 
     //Eventos
@@ -408,15 +449,15 @@ public class conectionBD {
 
         events auxEvent = getEvento(editEvent.getMsg());
 
-        if (editEvent.getDescricao() == null)
+        if (editEvent.getDescricao().isEmpty())
             editEvent.setDescricao(auxEvent.getDescricao());
-        if (editEvent.getLocal() == null)
+        if (editEvent.getLocal().isEmpty())
             editEvent.setLocal(auxEvent.getLocal());
-        if (editEvent.getData() == null)
+        if (editEvent.getData().isEmpty())
             editEvent.setData(auxEvent.getData());
-        if (editEvent.getHoraIncio() == null)
+        if (editEvent.getHoraIncio().isEmpty())
             editEvent.setHoraIncio(auxEvent.getHoraIncio());
-        if (editEvent.getHoraFim() == null)
+        if (editEvent.getHoraFim().isEmpty())
             editEvent.setHoraFim(auxEvent.getHoraFim());
 
 
@@ -459,6 +500,12 @@ public class conectionBD {
     } // testar -> FEITO
 
     public String eliminaPresenca(String email, String designacaoEvent){
+
+        if (!existEvento(designacaoEvent))
+            return "Evento nao existe";
+
+        if (!existPresencas(email, designacaoEvent))
+            return "Utilizador nao tem presenca registada neste evento";
 
         try(Statement stmt = conn.createStatement()){
             String deleteQuery = "DELETE FROM Presencas WHERE Evento_Designacao = '" + designacaoEvent + "' AND Utilizador_ID = '" + getID(email) + "'";
@@ -503,7 +550,7 @@ public class conectionBD {
             return "Codigo nao existe ou expirou";
 
         if (existPresencasUtilizador(email, codigo))
-            return "Utilizador ja tem presencas registadas";
+            return "Voce ja tem presença registada neste evento";
 
         try(Statement stmt = conn.createStatement()) {
 
@@ -530,8 +577,7 @@ public class conectionBD {
                     "FROM Presencas P " +
                     "JOIN Eventos E ON P.Evento_Designacao = E.Designacao " +
                     "JOIN Utilizadores U ON P.Utilizador_ID = U.Numero_Indentificacao " +
-                    "WHERE U.Email = '" + email + "' AND (E.Data LIKE '%" + filtro + "%' OR E.Localidade LIKE '%" + filtro + "%' OR E.Hora_Inicio LIKE '%" + filtro + "%' OR E.Hora_Fim LIKE '%" + filtro + "%')";
-
+                    "WHERE U.Email = '" + email + "' AND (E.Designacao LIKE '%" + filtro + "%' OR E.Data LIKE '%" + filtro + "%' OR E.Localidade LIKE '%" + filtro + "%' OR E.Hora_Inicio LIKE '%" + filtro + "%' OR E.Hora_Fim LIKE '%" + filtro + "%')";
             try (ResultSet rs = stmt.executeQuery(selectQuery)) {
                 while (rs.next()) {
                     // Aqui você pode processar os resultados, por exemplo, imprimindo no console
@@ -609,6 +655,8 @@ public class conectionBD {
         return consulta;
     } // testar ->
 
+
+
     //Codigos
     public String geraCodigo(String designacaoEvent, String tempoLimite){
 
@@ -616,6 +664,9 @@ public class conectionBD {
             return "Evento nao existe";
 
         int codigo = (int)(Math.random() * 100000);
+
+        if (verificaCodigoEvent(designacaoEvent))
+            return updateCodigo(designacaoEvent, tempoLimite, codigo);
 
         try(Statement stmt = conn.createStatement()) {
             String insertQuery = "INSERT INTO Codigo_Registo (codigo,Tempo,Evento_Designacao) VALUES ('" + codigo + "','" + tempoLimite + "', '" + designacaoEvent + "')";

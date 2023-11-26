@@ -34,20 +34,12 @@ public class servidorBackup {
 
         try {
 
-            /////////////////////////////////
-            try {
-                nif = NetworkInterface.getByInetAddress(InetAddress.getByName("192.168.56.1"));
-            } catch (SocketException | NullPointerException | UnknownHostException | SecurityException ex) {
-                nif = NetworkInterface.getByName(ADDRESS);
-            }
-
-
             mskt = new MulticastSocket(PORT);
-            mskt.joinGroup(new InetSocketAddress(ADDRESS, PORT),nif);
+            mskt.joinGroup(new InetSocketAddress(ADDRESS, PORT).getAddress());
 
             mchat = new MulticastChat("S", mskt);
 
-            mchat.run();
+            mchat.start();
 
             while (true){}
 

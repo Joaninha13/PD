@@ -53,7 +53,6 @@ public class MulticastChat extends Thread {
                     System.out.println();
                     System.out.print("(" + pkt.getAddress().getHostAddress() + ":" + pkt.getPort() + ") ");
 
-                    //Caso o objecto recebido seja uma instancia de Msg...
                     if (obj instanceof HeartBeatMess) {
 
                         hbm = (HeartBeatMess) obj;

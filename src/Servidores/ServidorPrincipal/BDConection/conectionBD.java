@@ -230,6 +230,25 @@ public class conectionBD {
 
     }
 
+    private boolean verificaEmail(String email) {
+
+        try(Statement stmt = conn.createStatement()) {
+            String selectQuery = "SELECT * FROM Utilizadores WHERE Email = '" + email + "'";
+            ResultSet rs = stmt.executeQuery(selectQuery);
+
+            // Verificar se há algum resultado
+            boolean existe = rs.next();
+
+            // Fechar recursos
+            rs.close();
+
+            return existe;
+        } catch (SQLException e) {
+            System.err.println("Erro ao verificar se email existe: " + e.getMessage());
+            return false;
+        }
+    }
+
     private events getEvento(String designacaoEvent) {
 
         try(Statement stmt = conn.createStatement()) {

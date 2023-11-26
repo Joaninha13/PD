@@ -23,6 +23,8 @@ public class MulticastChat extends Thread {
         running = false;
     }
 
+    public boolean isRunning(){return running;}
+
     @Override
     public void run() {
 
@@ -38,6 +40,8 @@ public class MulticastChat extends Thread {
 
             while (running) {
                 System.out.println("entrei no while");
+
+                s.setSoTimeout(30000);
 
                 pkt = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
                 s.receive(pkt);
@@ -78,6 +82,10 @@ public class MulticastChat extends Thread {
                 }
 
             }
+
+        }catch (SocketTimeoutException e){
+            System.out.println("Timeout");
+            terminate();
 
         } catch (IOException e) {
             if (running) {

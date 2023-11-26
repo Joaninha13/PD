@@ -40,9 +40,10 @@ public class servidorBackup {
             mchat = new MulticastChat("S", mskt);
 
             mchat.start();
+            mchat.join();
 
-            while (true){}
-
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             if (mchat != null) {
                 mchat.terminate();

@@ -281,29 +281,33 @@ public class conectionBD {
 
     //Utilizadores
 
-    public boolean autenticaCliente(String email, String password){
-        System.out.println("entrei no autenticaCliente");
+    public registo autenticaCliente(String email, String password){
+        registo reg = new registo(null, email, password);
 
         try(Statement stmt = conn.createStatement()) {
             String selectQuery = "SELECT * FROM Utilizadores WHERE Email = '" + email + "' AND Password = '" + password + "'";
             ResultSet rs = stmt.executeQuery(selectQuery);
 
-            // Verificar se há algum resultado
-            boolean autenticado = rs.next();
+            reg.setName(rs.getString("Nome"));
+            reg.setIdentificationNumber(rs.getInt("Numero_Indentificacao"));
 
-            // Fechar recursos
-            rs.close();
+            if(reg.getEmail().equals("admin@isec.pt")){
+                reg.setAdmin(true);
+            }
 
-            return autenticado;
+            reg.setValid(true);
+            reg.setMsg("Bem vindo");
+
+            return reg;
         } catch (SQLException e) {
             System.err.println("Erro ao autenticar utilizador: " + e.getMessage());
-            return false;
+            return null;
         }
     } // testar - > FEITO
 
     public registo registaCliente(registo reg){
 
-        if (autenticaCliente(reg.getEmail(), reg.getPassword())) {
+        if (verificaEmail(reg.getEmail())) {
             reg.setRegistered(false);
             reg.setMsg("Email ja se encontra registrado");
             return null;

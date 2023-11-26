@@ -10,7 +10,7 @@ public class registo implements Serializable {
     private String email;
     private String password;
     private String msg;
-    private boolean isRegistered;
+    private boolean isRegistered,isValid,isAdmin;
 
     public registo(String name, String email, String password) {
         this.name = name;
@@ -63,6 +63,22 @@ public class registo implements Serializable {
 
     public void setRegistered(boolean registered) {
         isRegistered = registered;
+    }
+
+    public boolean isValid() {
+        return isValid;
+    }
+
+    public void setValid(boolean valid) {
+        isValid = valid;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     @Override

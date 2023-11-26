@@ -41,19 +41,7 @@ public class conectionClientThread extends Thread{
 
                 log = (login) obj;
 
-                if (!bd.autenticaCliente(log.getEmail(), log.getPass())) {
-                    log.setValid(false);
-                    log.setMsg("Email ou password errados");
-                }
-                else {
-                    if(log.getEmail().equals("admin@isec.pt")){
-                        log.setAdmin(true);
-                    }
-                    log.setValid(true);
-                    log.setMsg("Bem vindo");
-                }
-
-                oout.writeObject(log);
+                oout.writeObject(bd.autenticaCliente(log.getEmail(), log.getPass()));
                 oout.flush();
             }
             else if (obj instanceof registo) {

@@ -25,15 +25,16 @@ public class ClientCommunication {
         this.socket = new Socket();
     }
 
-    public login authenticateUser(login userLogin) throws IOException, ClassNotFoundException {
+    public registo authenticateUser(String email,String password) throws IOException, ClassNotFoundException {
         try (Socket socket = new Socket(serverAddr, serverPort);
              ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
 
-            oout.writeObject(userLogin);
+            String message = "login " + email + " " + password;
+            oout.writeObject(message);
             oout.flush();
 
-            return (login) oin.readObject();
+            return (registo) oin.readObject();
         }
     }
 
@@ -173,7 +174,7 @@ public class ClientCommunication {
         }
     }
 
-    public ConsultPresence consultUserEvents(String userEmail) throws IOException, ClassNotFoundException {
+   /* public ConsultPresence consultUserEvents(String userEmail) throws IOException, ClassNotFoundException {
         try (Socket socket = new Socket(serverAddr, serverPort);
              ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
@@ -184,7 +185,7 @@ public class ClientCommunication {
 
             return (ConsultPresence) oin.readObject();
         }
-    }
+    }*/
 
     public String deleteRegisteredAttendance(String email, String eventName) throws IOException, ClassNotFoundException {
         try (Socket socket = new Socket(serverAddr, serverPort);

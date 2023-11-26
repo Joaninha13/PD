@@ -68,13 +68,13 @@ public class ClienteApp {
                         System.out.println("Introduza a sua password:");
                         password = sc.nextLine();
 
-                        login userLogin = new login(email, password);
-                        login responseLogin = communication.authenticateUser(userLogin);
+                        registo responseLogin = communication.authenticateUser(email, password);
 
                         if (responseLogin.isValid()) {
                             System.out.println("Autenticação bem-sucedida!");
                             isLoggedIn = true;
                             isAdmin = responseLogin.isAdmin();
+                            currentUser = responseLogin;
                         } else {
                             System.out.println("Erro de autenticação: " + responseLogin.getMsg());
                         }
@@ -98,11 +98,12 @@ public class ClienteApp {
                         System.out.println("4. Consultar Eventos");
                         System.out.println("5. Gerar código de registo da presença");
                         System.out.println("6. Consultar presenças registadas");
-                        System.out.println("7. Obter ficheiro csv");
+                        System.out.println("7. Obter ficheiro csv(.6)");
                         System.out.println("8. Consultar Eventos de um Utilizador");
-                        System.out.println("9. Eliminar Presenças Registadas");
-                        System.out.println("10. Inserção de Presenças");
-                        System.out.println("11. Logout");
+                        System.out.println("9. Obter ficheiro csv(.8)");
+                        System.out.println("10. Eliminar Presenças Registadas");
+                        System.out.println("11. Inserção de Presenças");
+                        System.out.println("12. Logout");
                     }
                     else{
                         System.out.println("\nMenu de Utilizador:");
@@ -123,7 +124,7 @@ public class ClienteApp {
                                 String nomeEvento = sc.nextLine();
                                 System.out.print("Local: ");
                                 String localEvento = sc.nextLine();
-                                System.out.print("Data (AAAA/MM/DD): ");
+                                System.out.print("Data (AAAA-MM-DD): ");
                                 String dataEvento = sc.nextLine();
                                 System.out.print("Hora de início (HH:MM): ");
                                 String horaInicio = sc.nextLine();
@@ -216,12 +217,12 @@ public class ClienteApp {
                                 break;
 
                             //case 7:
-                                //ficheiro com o ficheiro csv
+                                //ficheiro com o ficheiro csv(.6)
                             case 8:
                                 System.out.print("Insira o email do utilizador para consultar os seus eventos: ");
                                 String userEmail = sc.nextLine();
                                 try {
-                                    ConsultPresence userEvents = communication.consultUserEvents(userEmail);
+                                    ConsultPresence userEvents = communication.consultAttendance(userEmail, " ");
                                     for (events e : userEvents.getEvent()) {
                                         System.out.println(e.toString());
                                     }
@@ -229,7 +230,9 @@ public class ClienteApp {
                                     System.out.println("Erro ao consultar eventos do utilizador: " + e.getMessage());
                                 }
                                 break;
-                            case 9:
+                            //case 9:
+                            //ficheiro com o ficheiro csv(.8)
+                            case 10:
                                 System.out.print("Insira o email do utilizador: ");
                                 userEmail = sc.nextLine();
                                 System.out.print("Insira a designação do evento: ");
@@ -241,7 +244,7 @@ public class ClienteApp {
                                     System.out.println("Erro ao eliminar presenças registadas: " + e.getMessage());
                                 }
                                 break;
-                            case 10:
+                            case 11:
                                 System.out.print("Insira o email do utilizador: ");
                                 userEmail = sc.nextLine();
                                 System.out.print("Insira a designação do evento: ");
@@ -253,7 +256,7 @@ public class ClienteApp {
                                     System.out.println("Erro ao inserir presença: " + e.getMessage());
                                 }
                                 break;
-                            case 11:
+                            case 12:
                                 isLoggedIn = false;
                                 isAdmin = false;
                                 currentUser = null;
@@ -274,13 +277,6 @@ public class ClienteApp {
                                 if (!newName.isEmpty()) {
                                     currentUser.setName(newName);
 
-                                }
-
-                                System.out.println("Número de identificação atual: " + currentUser.getIdentificationNumber());
-                                System.out.print("Novo número de identificação: ");
-                                String newIdNumber = sc.nextLine();
-                                if (!newIdNumber.isEmpty()) {
-                                    currentUser.setIdentificationNumber(Integer.parseInt(newIdNumber));
                                 }
 
                                 System.out.println("Email atual: " + currentUser.getEmail());
@@ -327,7 +323,6 @@ public class ClienteApp {
 
                                 try {
                                     ConsultPresence attendanceResponse = communication.consultAttendance(currentUser.getEmail(), filter);
-                                    System.out.println("Resposta do servidor: " + attendanceResponse);
 
                                     attendanceResponse.getReg().forEach(reg -> System.out.println(reg.toString()));
                                     attendanceResponse.getEvent().forEach(event -> System.out.println(event.toString()));

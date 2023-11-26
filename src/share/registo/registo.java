@@ -83,9 +83,8 @@ public class registo implements Serializable {
 
     @Override
     public String toString() {
-        return "registo{" +
-                "name='" + name + '\'' +
-                ", identificationNumber='" + identificationNumber + '\'' +
+        return "name='" + name + '\'' +
+                ", id='" + identificationNumber + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

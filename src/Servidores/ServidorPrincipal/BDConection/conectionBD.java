@@ -1,27 +1,30 @@
 package Servidores.ServidorPrincipal.BDConection;
 
+import Servidores.ServidorPrincipal.Cluster.HeartBeat.DBUpdate;
+import Servidores.ServidorPrincipal.Cluster.HeartBeat.HeartBeat;
+import Servidores.ServidorPrincipal.utils.Time;
 import share.consultas.ConsultPresence;
 import share.events.events;
+import share.heartBeatMsg.HeartBeatMess;
 import share.registo.registo;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.DatagramPacket;
 import java.sql.*;
+import java.util.List;
 
 public class conectionBD {
-
     private static final String NOME_BD = "dataBaseTP.db";
     private int IDUtilizador;
     private static String dbDir;
-
     private static volatile conectionBD instance = null;
-
     // URL de conexão com o banco de dados
     private static String URL_CONEXAO;
-
     private static Connection conn;
+
+    private static final DBUpdate dbUpdate = DBUpdate.getInstance();
+
+
 
     public static conectionBD getInstance() {
         if (instance == null) {
@@ -33,7 +36,6 @@ public class conectionBD {
         }
         return instance;
     }
-
 
     // Start/create functions
     public conectionBD(String dbDir) {
@@ -48,6 +50,7 @@ public class conectionBD {
             System.out.println("Connection to SQLite has been established.");
             setIDUtilizador(getLastIDUtilizador() + 1);
             instance = this;
+            new Time().start();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -250,7 +253,7 @@ public class conectionBD {
         }
     }
 
-    private String updateCodigo(String designacaoEvent, String tempoLimite, int codigo){
+    private synchronized String updateCodigo(String designacaoEvent, String tempoLimite, int codigo){
 
         try(Statement stmt = conn.createStatement()) {
             String updateQuery = "UPDATE Codigo_Registo SET codigo = '" + codigo + "', Tempo = '" + tempoLimite + "' WHERE Evento_Desifnacao = '" + designacaoEvent + "'";
@@ -358,7 +361,7 @@ public class conectionBD {
         }
     } // testar - > FEITO
 
-    public registo registaCliente(registo reg){
+    public synchronized registo registaCliente(registo reg){
 
         if (reg.getEmail().isEmpty() || reg.getPassword().isEmpty()) {
             reg.setRegistered(false);
@@ -391,7 +394,7 @@ public class conectionBD {
         }
     } //testar ->
 
-    public registo editCliente(registo editReg){
+    public synchronized registo editCliente(registo editReg){
 
         // editar dados do utilizador
 
@@ -408,13 +411,9 @@ public class conectionBD {
         }
     } // testar ->
 
-    public void consultaCliente(String email){}
-
-
-
     //Eventos
 
-    public String criaEvento(String designacaoEvent, String local, String data, String horaInicio, String horaFim) {
+    public synchronized String criaEvento(String designacaoEvent, String local, String data, String horaInicio, String horaFim) {
 
         //testar primeiro mas em principio mudar a data e as horas para o seu tipo de dados (data, Time)
 
@@ -435,7 +434,7 @@ public class conectionBD {
 
     } // testar -> FEITO
 
-    public String editEvento(events editEvent){
+    public synchronized String editEvento(events editEvent){
         // editar dados do evento se nao tiver presenças registadas
 
         if (editEvent.getMsg() == null || editEvent.getMsg().equals(""))
@@ -475,7 +474,7 @@ public class conectionBD {
         }
     } // testar ->
 
-    public String eliminaEvento(String designacaoEvent){
+    public synchronized String eliminaEvento(String designacaoEvent){
 
         // eliminar um evento desde que nao tenha presenças associadas
 
@@ -499,7 +498,7 @@ public class conectionBD {
 
     } // testar -> FEITO
 
-    public String eliminaPresenca(String email, String designacaoEvent){
+    public synchronized String eliminaPresenca(String email, String designacaoEvent){
 
         if (!existEvento(designacaoEvent))
             return "Evento nao existe";
@@ -521,7 +520,7 @@ public class conectionBD {
 
     } // testar ->
 
-    public String inserePresenca(String email, String designacaoEvent){
+    public synchronized String inserePresenca(String email, String designacaoEvent){
 
             if (!existEvento(designacaoEvent))
                 return "Evento nao existe";
@@ -543,7 +542,7 @@ public class conectionBD {
         }
     } // testar ->
 
-    public String registaPresenca(String codigo, String email) {
+    public synchronized String registaPresenca(String codigo, String email) {
         //verificar se codigo existe e se ainda esta dentro do tempo limite
 
         if (!verificaCodigo(codigo))
@@ -602,6 +601,8 @@ public class conectionBD {
     public ConsultPresence consultaPresencasEvento(String designacaoEvent){
         ConsultPresence consulta = new ConsultPresence();
 
+        consulta.getEvent().add(getEvento(designacaoEvent));
+
         try (Statement stmt = conn.createStatement()) {
             String selectQuery = "SELECT U.Nome, U.Email, U.Numero_Indentificacao " +
                     "FROM Presencas P " +
@@ -613,8 +614,8 @@ public class conectionBD {
                 while (rs.next()) {
                     // Aqui você pode processar os resultados, por exemplo, imprimindo no console
                      System.out.println("Nome: " + rs.getString("Nome"));
-                        System.out.println("Email: " + rs.getString("Email"));
-                        System.out.println("Numero de Identificacao: " + rs.getInt("Numero_Indentificacao"));
+                     System.out.println("Email: " + rs.getString("Email"));
+                     System.out.println("Numero de Identificacao: " + rs.getInt("Numero_Indentificacao"));
 
                     consulta.getReg().add(new registo(rs.getString("Nome"), rs.getString("Email"), null));
                     consulta.getReg().get(consulta.getReg().size() - 1).setIdentificationNumber(rs.getInt("Numero_Indentificacao"));
@@ -652,13 +653,14 @@ public class conectionBD {
             System.err.println("Erro ao consultar eventos: " + e.getMessage());
             return null;
         }
+
+
         return consulta;
     } // testar ->
 
 
-
     //Codigos
-    public String geraCodigo(String designacaoEvent, String tempoLimite){
+    public synchronized String geraCodigo(String designacaoEvent, String tempoLimite){
 
         if (!existEvento(designacaoEvent))
             return "Evento nao existe";
@@ -679,6 +681,21 @@ public class conectionBD {
             return "Erro ao gerar codigo";
         }
 
+    } // testar ->
+
+    public synchronized void updateTimes() {
+        System.out.println("Decrementando o tempo na tabela Codigo_Registo");
+
+        try (Statement stmt = conn.createStatement()) {
+            String updateQuery = "UPDATE Codigo_Registo SET Tempo = Tempo - 1";
+            stmt.executeUpdate(updateQuery);
+
+            String deleteQuery = "DELETE FROM Codigo_Registo WHERE Tempo = -1";
+            stmt.executeUpdate(deleteQuery);
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao decrementar o tempo na tabela Codigo_Registo: " + e.getMessage());
+        }
     } // testar ->
 
     //Versao
@@ -709,10 +726,14 @@ public class conectionBD {
 
     public void updateVersion() {
 
+        int newversion = getVersion() + 1;
+
         try (Statement stmt = conn.createStatement()) {
 
-            String updateQuery = "UPDATE Versao SET numero_versao = '" + (getVersion() + 1) + "'";
+            String updateQuery = "UPDATE Versao SET numero_versao = '" + newversion + "'";
             stmt.executeUpdate(updateQuery);
+
+            dbUpdate.send(newversion);
 
         } catch (SQLException e) {
             System.err.println("Erro ao dar Update do numero da versao : " + e.getMessage());

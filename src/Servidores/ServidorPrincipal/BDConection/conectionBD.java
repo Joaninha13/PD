@@ -41,6 +41,8 @@ public class conectionBD {
     public conectionBD(String dbDir) {
         //connect a BD
 
+        System.out.println("DBUpdate: " + dbUpdate);
+
         URL_CONEXAO = "jdbc:sqlite:" + dbDir + "/" + NOME_BD;
 
         criarBD();

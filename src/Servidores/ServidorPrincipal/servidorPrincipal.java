@@ -45,7 +45,6 @@ public class servidorPrincipal{
             return;
         }
 
-        conectionBD bd = new conectionBD(args[1].trim());
 
         try(ServerSocket socket = new ServerSocket(Integer.parseInt(args[0]))){
 
@@ -54,9 +53,11 @@ public class servidorPrincipal{
 
             new DBUpdate(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT);
 
-            //new RmiService(args[2], Integer.parseInt(args[3]), DBDirectory).start();
+            conectionBD bd = new conectionBD(args[1].trim());
 
-            //new HeartBeat(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT).start();
+            new RmiService(args[2], Integer.parseInt(args[3]), DBDirectory).start();
+
+            new HeartBeat(args[2], Integer.parseInt(args[3]), ms, ipGroup, PORT).start();
 
             System.out.println("TCP Server iniciado no porto " + socket.getLocalPort() + " ...");
 

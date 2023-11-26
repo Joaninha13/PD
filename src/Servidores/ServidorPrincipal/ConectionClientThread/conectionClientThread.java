@@ -117,7 +117,7 @@ public class conectionClientThread extends Thread{
                 else if (parts[0].equals("ConsultPresenca")) {
                     //consultar presenças de um utilizador
 
-                        if (parts.length == 2)
+                    if (parts.length == 2)
                         oout.writeObject(bd.consultaPresencasUtilizador(parts[1], ""));
                     else
                         oout.writeObject(bd.consultaPresencasUtilizador(parts[1], parts[2]));
@@ -153,7 +153,10 @@ public class conectionClientThread extends Thread{
 
                 else if (parts[0].equals("CSVU")){
 
-                    escreverResultadosCSVUtilizador(bd.consultaPresencasEvento(parts[1]), parts[2]);
+                    if (parts.length == 3)
+                        escreverResultadosCSVUtilizador(bd.consultaPresencasUtilizador(parts[1], ""), parts[2]);
+                    else
+                        escreverResultadosCSVUtilizador(bd.consultaPresencasUtilizador(parts[1], parts[2]), parts[3]);
 
                     mandaFicheiro(parts[2]);
 

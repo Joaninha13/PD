@@ -24,12 +24,14 @@ public class DBUpdate {
     public static DBUpdate getInstance() {return instance;}
 
     public DBUpdate(String serviceNameRMI, int listeningPortRMI, MulticastSocket ms, InetAddress ipGroup, int port){
+        instance = this;
         this.listeningPortRMI = listeningPortRMI;
         this.serviceNameRMI = serviceNameRMI;
         this.ms = ms;
         this.ipGroup = ipGroup;
         this.port = port;
-        instance = this;
+
+        System.out.println("DBUpdate created: " + instance);
     }
 
 

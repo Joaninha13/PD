@@ -1,5 +1,6 @@
 package Servidores.ServidorBackup.Cluster;
 
+import Servidores.ServidorBackup.RmiServiceCli;
 import share.heartBeatMsg.HeartBeatMess;
 
 import java.io.*;
@@ -13,9 +14,13 @@ public class MulticastChat extends Thread {
     private final MulticastSocket s;
     protected boolean running;
 
-    public MulticastChat(String username, MulticastSocket s) {
+    private final File DBRDirectory;
+    private boolean justOneTime = false;
+
+    public MulticastChat(String username, MulticastSocket s, File DBRDirectory) {
         this.username = username;
         this.s = s;
+        this.DBRDirectory = DBRDirectory;
         running = true;
     }
 
@@ -57,16 +62,11 @@ public class MulticastChat extends Thread {
                     System.out.println();
                     System.out.print("(" + pkt.getAddress().getHostAddress() + ":" + pkt.getPort() + ") ");
 
-                    if (obj instanceof HeartBeatMess) {
+                    hbm = (HeartBeatMess) obj;
 
-                        hbm = (HeartBeatMess) obj;
-                        System.out.println("Db :" + hbm.getDatabaseVersion());
-                        System.out.println("Rmi :" + hbm.getServiceNameRMI());
-                        //Caso o objecto recebido seja uma instancia de String...
-                    } else if (obj instanceof String) {
-
-                        //Mostra a String
-                        System.out.println((String) obj + " (" + obj.getClass() + ")");
+                    if(!justOneTime){
+                        new RmiServiceCli(hbm.getServiceNameRMI(), pkt.getAddress().getHostAddress(), hbm.getListeningPortRMI(), DBRDirectory).start();
+                        justOneTime = true;
                     }
 
                     System.out.println();

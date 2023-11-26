@@ -12,41 +12,42 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class RmiServiceCli extends UnicastRemoteObject implements IRmiClient {
 
-    private static final String REGISTRY_IP = "127.0.0.1";
-
+    private static String REGISTRY_IP;
     private static String SERVICE_NAME;
     private static int RMI_PORT ;
     public static final int MAX_CHUNCK_SIZE = 10000; //bytes
-    private static String DIR;
+    private static final String DIR = "dataBaseTP.db";
     private static String RMILOC;
 
-    protected File DBRDirectory;
+    public final File DBRDirectory;
 
     FileOutputStream fout = null;
 
-    public RmiServiceCli(String name, int port, File DBRDirectory, String dir, String objectUrl) throws RemoteException {
+    public RmiServiceCli(String name, String ip, int port, File DBRDirectory) throws RemoteException {
         SERVICE_NAME = name;
+        REGISTRY_IP = ip;
         RMI_PORT = port;
-        DBRDirectory = this.DBRDirectory;
-        DIR = dir;
-        RMILOC = objectUrl;
+        this.DBRDirectory = DBRDirectory;
     }
 
     public void start(){
         try{
-            RmiServiceCli myRemoteService = null;
             IRmiService remoteFileService;
 
+            RMILOC = "rmi://" + REGISTRY_IP + ":" + RMI_PORT + "/" + SERVICE_NAME;
+
             try(FileOutputStream localFileOutputStream = new FileOutputStream(DIR)){
-                System.out.println("Ficheiro " + DIR + "criado.");
+                System.out.println("Ficheiro " + DIR + " criado.");
+
+                System.out.println("A ligar ao servico remoto " + RMILOC + "...");
+                System.out.println("DIR - " + DIR);
+                System.out.println("DBRDirectory - " + DBRDirectory);
 
                 remoteFileService = (IRmiService) Naming.lookup(RMILOC);
 
-                myRemoteService = new RmiServiceCli(SERVICE_NAME,RMI_PORT,DBRDirectory,DIR, RMILOC);
+                this.setFout(localFileOutputStream);
 
-                myRemoteService.setFout(localFileOutputStream);
-
-                remoteFileService.getDb(SERVICE_NAME,myRemoteService);
+                remoteFileService.getDb(DIR,this);
 
             }
 
@@ -60,7 +61,6 @@ public class RmiServiceCli extends UnicastRemoteObject implements IRmiClient {
     }
 
     public synchronized void setFout(FileOutputStream fout) {this.fout = fout;}
-
 
     @Override
     public void writeFileChunk(byte[] fileChunk, int nbytes) throws IOException {

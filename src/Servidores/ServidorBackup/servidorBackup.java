@@ -14,11 +14,10 @@ public class servidorBackup {
 
     private static final String ADDRESS = "230.44.44.44";
     private static final int PORT = 4444;
-    static String FILENAME = "presences.db";
+    static String FILENAME = "dataBaseTPReplic.db";
 
     public static void main(String[] args) throws IOException {
         File DBRDirectory;
-        String objectUrl;
         String filepath;
 
         boolean isEmptyDirectory;
@@ -31,10 +30,8 @@ public class servidorBackup {
         //System.setProperty("java.rmi.server.hostname", "192.168.56.1");
 
         //trocar para args[0]...
-        Path dirRepBd = Paths.get(args[1]);
-        DBRDirectory = new File(args[1].trim());
-        objectUrl = "rmi//localhost//servidor-backup-database";
-
+        Path dirRepBd = Paths.get(args[0]);
+        DBRDirectory = new File(args[0].trim());
 
         if(!DBRDirectory.exists()){
             System.out.println("A directoria " + DBRDirectory + " nao existe!");
@@ -73,13 +70,13 @@ public class servidorBackup {
 
             mskt = new MulticastSocket(PORT);
             mskt.joinGroup(new InetSocketAddress(ADDRESS, PORT),nif);
-            mchat = new MulticastChat("S", mskt);
+            mchat = new MulticastChat("S", mskt, DBRDirectory);
 
             mchat.start();
             mchat.join();
 
-            new RmiServiceCli("sv", PORT, DBRDirectory, filepath, objectUrl).start();
-
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             if (mchat != null) {
                 mchat.terminate();

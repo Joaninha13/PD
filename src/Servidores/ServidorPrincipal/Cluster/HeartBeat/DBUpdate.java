@@ -30,8 +30,6 @@ public class DBUpdate {
         this.ms = ms;
         this.ipGroup = ipGroup;
         this.port = port;
-
-        System.out.println("DBUpdate created: " + instance);
     }
 
 

@@ -182,11 +182,7 @@ public class RmiService extends UnicastRemoteObject implements IRmiService {
                  * sua interface remota.
                  */
 
-                System.out.println("vai escrever no cliente"); // para teste
-
                 cliRef.writeFileChunk(fileChunk, nbytes);
-
-                System.out.println("escreveu no cliente"); // para teste
 
             }
 

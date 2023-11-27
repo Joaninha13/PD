@@ -3,12 +3,11 @@ package Servidores.ServidorPrincipal.ConectionClientThread;
 import Servidores.ServidorPrincipal.BDConection.conectionBD;
 import share.consultas.ConsultPresence;
 import share.events.events;
-import share.login.login;
 import share.registo.registo;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
+
 public class conectionClientThread extends Thread{
 
     private static final int MAX_SIZE = 4000;
@@ -25,7 +24,6 @@ public class conectionClientThread extends Thread{
     @Override
     public void run(){
 
-        login log = null;
         registo reg = null;
         events event = null;
         String msg, resp;
@@ -35,7 +33,6 @@ public class conectionClientThread extends Thread{
 
             Object obj = oin.readObject();
 
-            // talvez mudar estes dois primeiros ifs para so mandar uma mensagem a dizer que o foi bem sucedido o não!!
             if (obj instanceof registo) {
 
                 reg = (registo) obj;
@@ -58,7 +55,6 @@ public class conectionClientThread extends Thread{
                 oout.flush();
 
             }
-            else if (obj instanceof ConsultPresence) {/*fazer coisas depois tenho de ver*/}
             else if (obj instanceof String) {
                 msg = (String) obj;
 
@@ -172,7 +168,6 @@ public class conectionClientThread extends Thread{
         } catch (IOException e) {
             System.out.println();
             System.out.println("Impossibilidade de aceder ao conteudo da mensagem recebida!");
-            e.printStackTrace();
         } catch(Exception e){
             assert auxSocket != null;
             System.out.println("Problema na comunicacao com o cliente " +
@@ -182,7 +177,6 @@ public class conectionClientThread extends Thread{
     }
 
     private void mandaFicheiro(String nomeArquivo) {
-        System.out.println("entrei no mandar e o filename é -> " + nomeArquivo);
         try (DataOutputStream dos = new DataOutputStream(toClientSocket.getOutputStream());
              FileInputStream fis = new FileInputStream(nomeArquivo)) {
 
@@ -200,7 +194,6 @@ public class conectionClientThread extends Thread{
 
         } catch (IOException e) {
             System.err.println("Erro ao enviar arquivo para o cliente: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

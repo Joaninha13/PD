@@ -36,6 +36,7 @@ public class MulticastChat extends Thread {
         DatagramPacket pkt;
         HeartBeatMess hbm;
         Object obj;
+        RmiServiceCli rmi = null;
 
         if (s == null || !running) {
             return;
@@ -44,7 +45,6 @@ public class MulticastChat extends Thread {
         try {
 
             while (running) {
-                System.out.println("entrei no while");
 
                 s.setSoTimeout(30000);
 
@@ -65,11 +65,12 @@ public class MulticastChat extends Thread {
                     hbm = (HeartBeatMess) obj;
 
                     if(!justOneTime){
-                        System.out.println("entrei no if -> " + pkt.getAddress().getHostAddress());
-                        new RmiServiceCli(hbm.getServiceNameRMI(), pkt.getAddress().getHostAddress(), pkt.getPort(), DBRDirectory).start();
+                        rmi = new RmiServiceCli(hbm.getServiceNameRMI(), pkt.getAddress().getHostAddress(), pkt.getPort(), DBRDirectory);
+                        rmi.runn();
                         justOneTime = true;
                     }
 
+                    rmi.runn();
                     System.out.println();
                     System.out.print("> ");
 

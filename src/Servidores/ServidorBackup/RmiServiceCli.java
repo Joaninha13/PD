@@ -28,21 +28,16 @@ public class RmiServiceCli extends UnicastRemoteObject implements IRmiClient {
         REGISTRY_IP = ip;
         RMI_PORT = port;
         this.DBRDirectory = DBRDirectory;
+
+        RMILOC = "rmi://" + REGISTRY_IP + "/" + SERVICE_NAME;
     }
 
-    public void start(){
-        while (true)
+    public void runn(){
         try{
             IRmiService remoteFileService;
 
-            RMILOC = "rmi://" + REGISTRY_IP + "/" + SERVICE_NAME;
-
             try(FileOutputStream localFileOutputStream = new FileOutputStream(DIR)){
                 System.out.println("Ficheiro " + DIR + " criado.");
-
-                System.out.println("A ligar ao servico remoto " + RMILOC);
-                System.out.println("DIR - " + DIR);
-                System.out.println("DBRDirectory - " + DBRDirectory);
 
                 remoteFileService = (IRmiService) Naming.lookup(RMILOC);
 

@@ -14,7 +14,7 @@ public class servidorBackup {
 
     private static final String ADDRESS = "230.44.44.44";
     private static final int PORT = 4444;
-    static String FILENAME = "dataBaseTPReplic.db";
+    static String FILENAME = "dataBaseTP.db";
 
     public static void main(String[] args) throws IOException {
         File DBRDirectory;
@@ -45,8 +45,8 @@ public class servidorBackup {
             System.out.println("Sem permissoes de escrita na diretoria " + DBRDirectory);
             return;
         }
-        if(!DBRDirectory.canWrite()){
-            System.out.println("Sem permissoes de escrita na diretoria " + DBRDirectory);
+        if((Files.list(dirRepBd).findAny().isPresent())) {
+            System.out.println("Diretoria não está vazia!\n");
             return;
         }
 

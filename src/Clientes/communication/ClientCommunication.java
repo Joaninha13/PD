@@ -5,11 +5,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 
 import share.consultas.ConsultPresence;
 import share.events.events;
-import share.login.login;
 import share.registo.registo;
 
 public class ClientCommunication {

@@ -18,12 +18,12 @@ public class conectionBD {
     private int IDUtilizador;
     private static String dbDir;
     private static volatile conectionBD instance = null;
+
     // URL de conexão com o banco de dados
     private static String URL_CONEXAO;
     private static Connection conn;
 
     private static final DBUpdate dbUpdate = DBUpdate.getInstance();
-
 
 
     public static conectionBD getInstance() {
@@ -40,8 +40,6 @@ public class conectionBD {
     // Start/create functions
     public conectionBD(String dbDir) {
         //connect a BD
-
-        System.out.println("DBUpdate: " + dbUpdate);
 
         URL_CONEXAO = "jdbc:sqlite:" + dbDir + "/" + NOME_BD;
 
@@ -95,9 +93,6 @@ public class conectionBD {
 
             // Verificar se há algum resultado
             int id = rs.getInt("Numero_Indentificacao");
-
-            System.out.println("ID: " + id);
-
 
             // Fechar recursos
             rs.close();
@@ -170,9 +165,8 @@ public class conectionBD {
 
     private boolean existPresencas(String email, String designacaoEvent) {
 
-        try {
+        try(Statement stmt = conn.createStatement()) {
             String selectQuery = "SELECT * FROM Presencas WHERE Evento_Designacao = '" + designacaoEvent + "' OR Utilizador_ID = '" + getID(email) + "'";
-            Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(selectQuery);
 
             // Verificar se há algum resultado
@@ -180,7 +174,6 @@ public class conectionBD {
 
             // Fechar recursos
             rs.close();
-            stmt.close();
 
             return existe;
         } catch (SQLException e) {
@@ -191,9 +184,8 @@ public class conectionBD {
 
     private boolean existPresencasEvent(String designacaoEvent) {
 
-        try {
+        try(Statement stmt = conn.createStatement()) {
             String selectQuery = "SELECT * FROM Presencas WHERE Evento_Designacao = '" + designacaoEvent + "'";
-            Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(selectQuery);
 
             // Verificar se há algum resultado
@@ -201,7 +193,6 @@ public class conectionBD {
 
             // Fechar recursos
             rs.close();
-            stmt.close();
 
             return existe;
         } catch (SQLException e) {
@@ -477,8 +468,6 @@ public class conectionBD {
         if (editEvent.getHoraFim().isEmpty())
             editEvent.setHoraFim(auxEvent.getHoraFim());
 
-
-
         try(Statement stmt = conn.createStatement()) {
             String updateQuery = "UPDATE Eventos SET Designacao = '" + editEvent.getDescricao() + "', Localidade = '" + editEvent.getLocal() + "', Data = '" + editEvent.getData() + "', Hora_Inicio = '" + editEvent.getHoraIncio() + "', Hora_Fim = '" + editEvent.getHoraFim() + "' WHERE Designacao = '" + editEvent.getMsg() + "'";
             stmt.executeUpdate(updateQuery);
@@ -493,7 +482,6 @@ public class conectionBD {
     } // testar ->
 
     public synchronized String eliminaEvento(String designacaoEvent){
-
         // eliminar um evento desde que nao tenha presenças associadas
 
         if (!existEvento(designacaoEvent))
@@ -704,7 +692,6 @@ public class conectionBD {
     } // testar ->
 
     public synchronized void updateTimes() {
-        System.out.println("Decrementando o tempo na tabela Codigo_Registo");
 
         try (Statement stmt = conn.createStatement()) {
             String updateQuery = "UPDATE Codigo_Registo SET Tempo = Tempo - 1";

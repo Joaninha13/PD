@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.util.Scanner;
 import Clientes.communication.ClientCommunication;
 import share.consultas.ConsultPresence;
-import share.login.login;
 import share.registo.registo;
 import share.events.events;
 

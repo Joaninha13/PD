@@ -11,7 +11,6 @@ public interface IRmiService extends Remote {
     void getDb(String fileName, IRmiClient cliRef) throws IOException, RemoteException;
 
     void addBackUp(IRmiObserver serverBackup) throws RemoteException;
-
     void deleteBackUp(IRmiObserver serverBackup) throws RemoteException;
 
 }

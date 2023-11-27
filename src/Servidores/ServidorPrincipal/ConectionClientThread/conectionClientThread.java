@@ -153,12 +153,14 @@ public class conectionClientThread extends Thread{
 
                 else if (parts[0].equals("CSVU")){
 
-                    if (parts.length == 3)
+                    if (parts.length == 3) {
                         escreverResultadosCSVUtilizador(bd.consultaPresencasUtilizador(parts[1], ""), parts[2]);
-                    else
+                        mandaFicheiro(parts[2]);
+                    }
+                    else {
                         escreverResultadosCSVUtilizador(bd.consultaPresencasUtilizador(parts[1], parts[2]), parts[3]);
-
-                    mandaFicheiro(parts[2]);
+                        mandaFicheiro(parts[3]);
+                    }
 
                 }
 
@@ -170,6 +172,7 @@ public class conectionClientThread extends Thread{
         } catch (IOException e) {
             System.out.println();
             System.out.println("Impossibilidade de aceder ao conteudo da mensagem recebida!");
+            e.printStackTrace();
         } catch(Exception e){
             assert auxSocket != null;
             System.out.println("Problema na comunicacao com o cliente " +
@@ -179,6 +182,7 @@ public class conectionClientThread extends Thread{
     }
 
     private void mandaFicheiro(String nomeArquivo) {
+        System.out.println("entrei no mandar e o filename é -> " + nomeArquivo);
         try (DataOutputStream dos = new DataOutputStream(toClientSocket.getOutputStream());
              FileInputStream fis = new FileInputStream(nomeArquivo)) {
 
@@ -195,6 +199,7 @@ public class conectionClientThread extends Thread{
             System.out.println("Arquivo enviado com sucesso para o cliente.");
 
         } catch (IOException e) {
+            System.err.println("Erro ao enviar arquivo para o cliente: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -229,7 +234,8 @@ public class conectionClientThread extends Thread{
 
         } catch (IOException e) {
             System.err.println("Erro ao escrever no arquivo CSV: " + e.getMessage());
+        }catch (IndexOutOfBoundsException e){
+            System.err.println("Erro: a lista está vazia!");
         }
     }
-
 }

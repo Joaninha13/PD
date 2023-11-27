@@ -258,7 +258,7 @@ public class conectionBD {
     private synchronized String updateCodigo(String designacaoEvent, String tempoLimite, int codigo){
 
         try(Statement stmt = conn.createStatement()) {
-            String updateQuery = "UPDATE Codigo_Registo SET codigo = '" + codigo + "', Tempo = '" + tempoLimite + "' WHERE Evento_Desifnacao = '" + designacaoEvent + "'";
+            String updateQuery = "UPDATE Codigo_Registo SET codigo = '" + codigo + "', Tempo = '" + tempoLimite + "' WHERE Evento_Designacao = '" + designacaoEvent + "'";
             stmt.executeUpdate(updateQuery);
 
             return "Codigo editado com sucesso -> " + codigo;
@@ -412,6 +412,22 @@ public class conectionBD {
             return null;
         }
     } // testar ->
+
+    private registo getClient(String email){
+        try(Statement stmt = conn.createStatement()){
+            String selectQuery = "SELECT * FROM Utilizadores WHERE Email = '" + email + "'";
+            ResultSet rs = stmt.executeQuery(selectQuery);
+
+            registo reg = new registo(rs.getString("Nome"), rs.getString("Email"), rs.getString("Password"));
+            reg.setIdentificationNumber(rs.getInt("Numero_Indentificacao"));
+
+            return reg;
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar utilizador: " + e.getMessage());
+            return null;
+        }
+    }
 
     //Eventos
 
@@ -572,6 +588,8 @@ public class conectionBD {
     //Consultas
     public ConsultPresence consultaPresencasUtilizador(String email, String filtro){
         ConsultPresence consulta = new ConsultPresence();
+
+        consulta.getReg().add(getClient(email));
 
         try (Statement stmt = conn.createStatement()) {
             String selectQuery = "SELECT P.Evento_Designacao, E.Localidade, E.Data, E.Hora_Inicio, E.Hora_Fim " +

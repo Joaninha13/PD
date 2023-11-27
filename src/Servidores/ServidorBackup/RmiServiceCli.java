@@ -19,11 +19,11 @@ public class RmiServiceCli extends UnicastRemoteObject implements IRmiClient {
     private static final String DIR = "dataBaseTP.db";
     private static String RMILOC;
 
-    public final File DBRDirectory;
+    public final String DBRDirectory;
 
     FileOutputStream fout = null;
 
-    public RmiServiceCli(String name, String ip, int port, File DBRDirectory) throws RemoteException {
+    public RmiServiceCli(String name, String ip, int port, String DBRDirectory) throws RemoteException {
         SERVICE_NAME = name;
         REGISTRY_IP = ip;
         RMI_PORT = port;
@@ -31,15 +31,16 @@ public class RmiServiceCli extends UnicastRemoteObject implements IRmiClient {
     }
 
     public void start(){
+        while (true)
         try{
             IRmiService remoteFileService;
 
-            RMILOC = "rmi://" + REGISTRY_IP + ":" + RMI_PORT + "/" + SERVICE_NAME;
+            RMILOC = "rmi://" + REGISTRY_IP + "/" + SERVICE_NAME;
 
             try(FileOutputStream localFileOutputStream = new FileOutputStream(DIR)){
                 System.out.println("Ficheiro " + DIR + " criado.");
 
-                System.out.println("A ligar ao servico remoto " + RMILOC + "...");
+                System.out.println("A ligar ao servico remoto " + RMILOC);
                 System.out.println("DIR - " + DIR);
                 System.out.println("DBRDirectory - " + DBRDirectory);
 

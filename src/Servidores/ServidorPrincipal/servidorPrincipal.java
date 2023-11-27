@@ -21,12 +21,12 @@ public class servidorPrincipal{
     public static void main(String[] args) {
         File DBDirectory;
 
-        if(args.length != 4){
-            System.out.println("Sintaxe: java servidorPrincipal <listeningPort> <localDirectoryBD> <serviceNameRMI> <listeningPortRMI>");
+        if(args.length != 5){
+            System.out.println("Sintaxe: java servidorPrincipal <listeningPort> <localDirectoryBD> <serviceNameRMI> <listeningPortRMI> <IP_Interface_Network_RMI_Service>");
             return;
         }
 
-        //System.setProperty("java.rmi.server.hostname", "193.137.78.17");
+        System.setProperty("java.rmi.server.hostname", args[4]);
 
         DBDirectory = new File(args[1].trim());
 

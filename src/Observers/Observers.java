@@ -1,6 +1,7 @@
 package Observers;
 
 import share.RMI.IRmiObserver;
+import share.RMI.IRmiService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,24 +22,25 @@ public class Observers extends UnicastRemoteObject implements IRmiObserver {
     public static void main(String[] args) {
 
         try {
-            if (args.length < 3) {
+            if (args.length < 2) {
 
                 System.out.println("Deve passar 3 argumentos na linha de comando:");
                 System.out.println("1 - Endereço do RMI Registry onde esta registado o servico remoto de download ");
                 System.out.println("2 - Nome do serviço do RMI Registry onde esta registado o servico remoto de download");
-                System.out.println("3 . Endereço IP da interface de rede que deve ser incluido");
                 System.exit(1);
             }
 
-            System.setProperty("java.rmi.server.hostname", args[2]);
+            System.setProperty("java.rmi.server.hostname", args[0]);
 
             //localiza o servico remoto nomeado "GetRemoteFileService"
             String objectUrl = "rmi://" + args[0] + "/" + args[1];
 
             System.out.println("Vou procurar o servico remoto em " + objectUrl);
 
+            IRmiService remoteFileService = (IRmiService) Naming.lookup(objectUrl);
+
             // ver isto ainda depois!!
-            Object getRemote = (Object) Naming.lookup(objectUrl);
+            IRmiService getRemote = (IRmiService) Naming.lookup(objectUrl);
 
             //Cria e lanca o servico
 
@@ -46,11 +48,14 @@ public class Observers extends UnicastRemoteObject implements IRmiObserver {
             System.out.println("Serviço GetRemoteFileObserver criado e em execução");
 
             //adiciona o observador no serviço remoto
+            remoteFileService.addBackUp(observer);
 
 
             System.out.println("<ENTER> para terminar...");
             System.in.read();
-            System.exit(0);
+
+            remoteFileService.deleteBackUp(observer);
+            UnicastRemoteObject.unexportObject(observer, true);
 
 
         } catch (NotBoundException e) {

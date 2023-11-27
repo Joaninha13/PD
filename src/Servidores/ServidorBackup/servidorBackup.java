@@ -22,16 +22,16 @@ public class servidorBackup {
 
         boolean isEmptyDirectory;
 
-        if(args.length != 1){
-            System.out.println("Sintaxe: java servidorBackup <dir_replica_bd>");
+        if(args.length != 2){
+            System.out.println("Sintaxe: java servidorBackup <dir_replica_bd> <IP_Interface_Network_RMI_Service>");
             return;
         }
 
-        //System.setProperty("java.rmi.server.hostname", "192.168.56.1");
+        System.setProperty("java.rmi.server.hostname", args[1]);
 
         //trocar para args[0]...
-        Path dirRepBd = Paths.get(args[0]);
-        DBRDirectory = new File(args[0].trim());
+        Path dirRepBd = Paths.get(args[0].trim());
+        DBRDirectory = new File(dirRepBd.toAbsolutePath().toString());
 
         if(!DBRDirectory.exists()){
             System.out.println("A directoria " + DBRDirectory + " nao existe!");
@@ -45,8 +45,9 @@ public class servidorBackup {
             System.out.println("Sem permissoes de escrita na diretoria " + DBRDirectory);
             return;
         }
-        if(!(isEmptyDirectory = Files.list(dirRepBd).findAny().isPresent())) {
-            System.out.println("Diretoria não está vazia!\n");
+        if(!DBRDirectory.canWrite()){
+            System.out.println("Sem permissoes de escrita na diretoria " + DBRDirectory);
+            return;
         }
 
         NetworkInterface nif;
@@ -70,7 +71,7 @@ public class servidorBackup {
 
             mskt = new MulticastSocket(PORT);
             mskt.joinGroup(new InetSocketAddress(ADDRESS, PORT),nif);
-            mchat = new MulticastChat("S", mskt, DBRDirectory);
+            mchat = new MulticastChat("S", mskt, filepath);
 
             mchat.start();
             mchat.join();

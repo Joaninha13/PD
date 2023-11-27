@@ -18,7 +18,6 @@ INSERT INTO Versao (numero_versao) VALUES (0);
 -- para teste
 
 -- Inserir dados em múltiplas tabelas para teste
-INSERT INTO Versao (numero_versao) VALUES (1);
 
 INSERT INTO Eventos (Designacao, Localidade, Data, Hora_Inicio, Hora_Fim) VALUES
                                                                               ('Evento1', 'LocalA', '2023-01-01', '10:00:00', '12:00:00'),

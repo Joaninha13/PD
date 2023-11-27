@@ -14,10 +14,10 @@ public class MulticastChat extends Thread {
     private final MulticastSocket s;
     protected boolean running;
 
-    private final File DBRDirectory;
+    private final String DBRDirectory;
     private boolean justOneTime = false;
 
-    public MulticastChat(String username, MulticastSocket s, File DBRDirectory) {
+    public MulticastChat(String username, MulticastSocket s, String DBRDirectory) {
         this.username = username;
         this.s = s;
         this.DBRDirectory = DBRDirectory;
@@ -65,7 +65,8 @@ public class MulticastChat extends Thread {
                     hbm = (HeartBeatMess) obj;
 
                     if(!justOneTime){
-                        new RmiServiceCli(hbm.getServiceNameRMI(), pkt.getAddress().getHostAddress(), hbm.getListeningPortRMI(), DBRDirectory).start();
+                        System.out.println("entrei no if -> " + pkt.getAddress().getHostAddress());
+                        new RmiServiceCli(hbm.getServiceNameRMI(), pkt.getAddress().getHostAddress(), pkt.getPort(), DBRDirectory).start();
                         justOneTime = true;
                     }
 

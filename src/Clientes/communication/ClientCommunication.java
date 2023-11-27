@@ -1,12 +1,11 @@
 package Clientes.communication;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 import share.consultas.ConsultPresence;
 import share.events.events;
@@ -15,6 +14,7 @@ import share.registo.registo;
 
 public class ClientCommunication {
 
+    private static final int MAX_SIZE = 4000;
     private InetAddress serverAddr;
     private int serverPort;
     private Socket socket;
@@ -174,19 +174,6 @@ public class ClientCommunication {
         }
     }
 
-   /* public ConsultPresence consultUserEvents(String userEmail) throws IOException, ClassNotFoundException {
-        try (Socket socket = new Socket(serverAddr, serverPort);
-             ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
-             ObjectInputStream oin = new ObjectInputStream(socket.getInputStream())) {
-
-            String message = "consultPresenca " + userEmail;
-            oout.writeObject(message);
-            oout.flush();
-
-            return (ConsultPresence) oin.readObject();
-        }
-    }*/
-
     public String deleteRegisteredAttendance(String email, String eventName) throws IOException, ClassNotFoundException {
         try (Socket socket = new Socket(serverAddr, serverPort);
              ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
@@ -223,4 +210,51 @@ public class ClientCommunication {
             return false;
         }
     }
+
+    public void obterArquivoCSV(String serverAddress, int serverPort, String userEmail, String filtro, String nomeArquivoCSV) {
+        try (Socket socketToServer = new Socket(serverAddress, serverPort);
+             ObjectOutputStream dout = new ObjectOutputStream(socketToServer.getOutputStream());
+             DataInputStream din = new DataInputStream(socketToServer.getInputStream());
+             FileOutputStream fileOut = new FileOutputStream("src/Clientes/utils" + File.separator + nomeArquivoCSV)) {
+
+            String msg = "CSVU " + userEmail + " " + filtro + " " + nomeArquivoCSV;
+            dout.writeObject(msg);
+            dout.flush();
+
+            byte[] fileChunk = new byte[MAX_SIZE];
+            int nbytes;
+            while ((nbytes = din.read(fileChunk)) > 0) {
+                fileOut.write(fileChunk, 0, nbytes);
+            }
+
+            System.out.println("Arquivo " + nomeArquivoCSV + " recebido com sucesso.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Erro ao enviar/receber dados: " + e.getMessage());
+        }
+    }
+
+    public void obterArquivoECSV(String serverAddress, int serverPort, String designacao, String nomeArquivoCSV) {
+        try (Socket socketToServer = new Socket(serverAddress, serverPort);
+             ObjectOutputStream dout = new ObjectOutputStream(socketToServer.getOutputStream());
+             DataInputStream din = new DataInputStream(socketToServer.getInputStream());
+             FileOutputStream fileOut = new FileOutputStream("src/Clientes/utils" + File.separator + nomeArquivoCSV)) {
+
+            String msg = "CSVE " + designacao + " " + nomeArquivoCSV;
+            dout.writeObject(msg);
+            dout.flush();
+
+            byte[] fileChunk = new byte[MAX_SIZE];
+            int nbytes;
+            while ((nbytes = din.read(fileChunk)) > 0) {
+                fileOut.write(fileChunk, 0, nbytes);
+            }
+
+            System.out.println("Arquivo " + nomeArquivoCSV + " recebido com sucesso.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Erro ao enviar/receber dados: " + e.getMessage());
+        }
+    }
+
 }

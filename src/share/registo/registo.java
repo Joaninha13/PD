@@ -85,7 +85,6 @@ public class registo implements Serializable {
     public String toString() {
         return "name='" + name + '\'' +
                 ", id='" + identificationNumber + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+                ", email='" + email + '\'';
     }
 }

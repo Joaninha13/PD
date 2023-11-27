@@ -215,12 +215,20 @@ public class ClienteApp {
                                     System.out.println("Erro ao consultar presenças: " + e.getMessage());
                                 }
                                 break;
+                            case 7:
+                                System.out.print("Email do utilizador: ");
+                                String userEmail = sc.nextLine();
 
-                            //case 7:
-                                //ficheiro com o ficheiro csv(.6)
+                                System.out.print("Digite um filtro (ou deixe em branco): ");
+                                filtro = sc.nextLine();
+
+                                System.out.print("Digite o nome do arquivo CSV: ");
+                                String nomeArquivoCSV = sc.nextLine();
+                                communication.obterArquivoCSV(serverAddress, serverPort, userEmail, filtro, nomeArquivoCSV + ".csv");
+                                break;
                             case 8:
                                 System.out.print("Insira o email do utilizador para consultar os seus eventos: ");
-                                String userEmail = sc.nextLine();
+                                userEmail = sc.nextLine();
                                 try {
                                     ConsultPresence userEvents = communication.consultAttendance(userEmail, " ");
                                     for (events e : userEvents.getEvent()) {
@@ -230,8 +238,14 @@ public class ClienteApp {
                                     System.out.println("Erro ao consultar eventos do utilizador: " + e.getMessage());
                                 }
                                 break;
-                            //case 9:
-                            //ficheiro com o ficheiro csv(.8)
+                            case 9:
+                                System.out.print("Designacao do evento: ");
+                                String designacao = sc.nextLine();
+
+                                System.out.print("Digite o nome do arquivo CSV: ");
+                                nomeArquivoCSV = sc.nextLine();
+                                communication.obterArquivoECSV(serverAddress, serverPort, designacao, nomeArquivoCSV + ".csv");
+                                break;
                             case 10:
                                 System.out.print("Insira o email do utilizador: ");
                                 userEmail = sc.nextLine();
@@ -331,8 +345,14 @@ public class ClienteApp {
                                 }
                                 break;
 
-                            // case 4:
-                                //ficheiro com o ficheiro csv
+                            case 4:
+                                System.out.print("Digite um filtro (ou deixe em branco): ");
+                                String filtro = sc.nextLine();
+
+                                System.out.print("Digite o nome do arquivo CSV: ");
+                                String nomeArquivoCSV = sc.nextLine();
+                                communication.obterArquivoCSV(serverAddress, serverPort, currentUser.getEmail(), filtro, nomeArquivoCSV + ".csv");
+                                break;
                             case 9:
                                 isLoggedIn = false;
                                 currentUser = null;
